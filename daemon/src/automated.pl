@@ -1,11 +1,51 @@
 #!/usr/bin/perl -w
 
-
+use Data::Dumper;
 use IO::Socket;
 use IO::Select;
+use Test::XML;
+use XML::Simple qw(:strict);
+
 
 my $CLIENT_SOCKET = 0;
 my $readable_handles;
+my $status;
+
+sub init
+{
+  $status->{'status'} = "on";
+}
+
+
+
+
+sub is_valid_request
+{
+  my $buf = shift;
+  if ( is_well_formed_xml ($buf))
+  {
+    return 1;
+  }
+  return 0;
+}
+
+sub build_answer
+{
+  my $request = shift; 
+  my $answer;
+  
+  if ($request->{'cmd'} eq "get-global-status")
+  {
+    $answer->{'type'} = "global-status";
+    $answer->{'value'} = $status->{'status'};
+  }
+  else
+  {
+    $answer->{'type'} = "quit";
+  }
+  return $answer;
+}
+
 
 my $server_socket = new IO::Socket::INET (
   LocalHost => "localhost",
@@ -16,7 +56,8 @@ my $server_socket = new IO::Socket::INET (
   timeout => 5,
 );
 die "Could not create socket: $!n" unless $server_socket;
-print "created socket $server_socket";
+
+#print "created socket $server_socket";
 
 $Read_Handles_Object = new IO::Select(); # create handle set for reading
 $Read_Handles_Object->add($server_socket); # add the main socket to the set
@@ -54,7 +95,8 @@ while (1) { # forever
 	#print " %%% Adding '$client' to read setn";
       }
 # otherwise it is an ordinary socket and we should read and process the request
-      else {
+      else 
+      {
 #print " --this is an ordinary socket '$rh'n";
 
 	$buf = $rh->getline(); # grab a line .. it shouldnt block due to the select
@@ -63,10 +105,45 @@ while (1) { # forever
 	  # it from the list of sockets to listen to..
 	  print " |FROM CLIENT ".$ClientNumber{$rh}."| --socket closed--n";
 	  $Read_Handles_Object->remove($rh);
+	  
+	  $CLIENT_COUNT = $CLIENT_COUNT - 1;
 	  close($rh);
-	  last;
 	}
-      print " |FROM CLIENT ".$ClientNumber{$rh}."|$buf";
+	else
+	{
+	  if (is_valid_request ($buf) != 1)
+	  {
+	    print "bad request, closing\n";
+	    $Read_Handles_Object->remove($rh);
+	  
+	    $CLIENT_COUNT = $CLIENT_COUNT - 1;
+	    close($rh);
+	  }
+	  else
+	  {
+	    my $request = XMLin($buf,KeyAttr => { server => 'name' }, ForceArray => [ 'server', 'address' ]);
+	    print Dumper $request;
+	    my $answer = build_answer ($request);
+	    
+	    if ($answer->{'type'} eq "quit")
+	    {
+	      print "bad answer, closing\n";
+	    
+	      $Read_Handles_Object->remove($rh);
+	  
+	      $CLIENT_COUNT = $CLIENT_COUNT - 1;
+	      close($rh);
+	    }
+	    print " |FROM CLIENT ".$ClientNumber{$rh}."|$buf";
+	    my $output = XMLout ($answer,KeyAttr => { server => 'answer' }) . "\n";
+	    print $rh $output;
+	    print Dumper $answer;
+	    print " |TO CLIENT ".$ClientNumber{$rh}."|$output";
+
+	    $rh->flush;
+	    
+	  }
+	}
       }
     }
   }
