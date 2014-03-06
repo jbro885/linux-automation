@@ -10,13 +10,23 @@ use XML::Simple qw(:strict);
 my $CLIENT_SOCKET = 0;
 my $readable_handles;
 my $status;
+my $buf;
+sub start_global
+{
+  print "Starting the system globally\n";
+  return 1;
+}
+
+sub stop_global
+{
+  print "Stopping the system globally\n";
+  return 1;
+}
 
 sub init
 {
   $status->{'status'} = "on";
 }
-
-
 
 
 sub is_valid_request
@@ -39,6 +49,26 @@ sub build_answer
     $answer->{'type'} = "global-status";
     $answer->{'value'} = $status->{'status'};
   }
+  elsif ($request->{'cmd'} eq "set-global-status")
+  {
+    if ($request->{'value'} eq "on")
+    {
+      $answer->{'type'} = "global-status";
+      
+      if (start_global () == 1)
+      {
+	$answer->{'value'} = "on"};
+      }
+      
+    }
+    else
+    {
+      if (stop_global () == 1)
+      {
+	$answer->{'value'} = "off"};
+      }
+    }
+  }
   else
   {
     $answer->{'type'} = "quit";
@@ -46,6 +76,12 @@ sub build_answer
   return $answer;
 }
 
+
+
+#############################################
+# MAIN PROGRAM
+############################################
+init();
 
 my $server_socket = new IO::Socket::INET (
   LocalHost => "localhost",
@@ -98,50 +134,61 @@ while (1) { # forever
       else 
       {
 #print " --this is an ordinary socket '$rh'n";
-
-	$buf = $rh->getline(); # grab a line .. it shouldnt block due to the select
-	if (! defined $buf) {
-	  # the other end of the socket closed...close our end and remove
-	  # it from the list of sockets to listen to..
-	  print " |FROM CLIENT ".$ClientNumber{$rh}."| --socket closed--n";
-	  $Read_Handles_Object->remove($rh);
-	  
-	  $CLIENT_COUNT = $CLIENT_COUNT - 1;
-	  close($rh);
-	}
-	else
+    
+    
+	while (defined ($rh) && defined (fileno ($rh)) && (fileno ($rh) != -1 ) && ($buf = <$rh>))
 	{
-	  if (is_valid_request ($buf) != 1)
-	  {
-	    print "bad request, closing\n";
+	print "buf=$buf\n";
+	  # grab a line .. it shouldnt block due to the select
+	  if (! defined $buf) {
+	    # the other end of the socket closed...close our end and remove
+	    # it from the list of sockets to listen to..
+	    print " |FROM CLIENT ".$ClientNumber{$rh}."| --socket closed--n";
 	    $Read_Handles_Object->remove($rh);
-	  
+	    
 	    $CLIENT_COUNT = $CLIENT_COUNT - 1;
 	    close($rh);
 	  }
 	  else
 	  {
-	    my $request = XMLin($buf,KeyAttr => { server => 'name' }, ForceArray => [ 'server', 'address' ]);
-	    print Dumper $request;
-	    my $answer = build_answer ($request);
-	    
-	    if ($answer->{'type'} eq "quit")
+	    if (is_valid_request ($buf) != 1)
 	    {
-	      print "bad answer, closing\n";
-	    
+	      print "bad request, closing\n";
 	      $Read_Handles_Object->remove($rh);
-	  
+	    
 	      $CLIENT_COUNT = $CLIENT_COUNT - 1;
 	      close($rh);
 	    }
-	    print " |FROM CLIENT ".$ClientNumber{$rh}."|$buf";
-	    my $output = XMLout ($answer,KeyAttr => { server => 'answer' }) . "\n";
-	    print $rh $output;
-	    print Dumper $answer;
-	    print " |TO CLIENT ".$ClientNumber{$rh}."|$output";
-
-	    $rh->flush;
+	    else
+	    {
+	      my $request = XMLin($buf,KeyAttr => { server => 'name' }, ForceArray => [ 'server', 'address' ]);
+	      print Dumper $request;
+	      my $answer = build_answer ($request);
+	      
+	      if ($answer->{'type'} eq "quit")
+	      {
+		print "quit answer, closing\n";
+	      
+		$Read_Handles_Object->remove($rh);
 	    
+		$CLIENT_COUNT = $CLIENT_COUNT - 1;
+		close($rh);
+	      }
+	      else
+	      {
+		print " |FROM CLIENT ".$ClientNumber{$rh}."|$buf";
+		my $output = XMLout ($answer,KeyAttr => { server => 'answer' }) . "\n";
+		print $rh $output;
+		print Dumper $answer;
+		print " |TO CLIENT ".$ClientNumber{$rh}."|$output";
+
+		$rh->flush;
+		
+		$Read_Handles_Object->remove($rh);
+		$CLIENT_COUNT = $CLIENT_COUNT - 1;
+		close($rh);
+	      }
+	   }
 	  }
 	}
       }
