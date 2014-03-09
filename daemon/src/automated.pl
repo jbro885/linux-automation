@@ -56,8 +56,8 @@ sub build_answer
       $answer->{'type'} = "global-status";
       
       if (start_global () == 1)
-      {
-	$answer->{'value'} = "on"};
+      {      
+         $answer->{'value'} = "on";
       }
       
     }
@@ -65,7 +65,7 @@ sub build_answer
     {
       if (stop_global () == 1)
       {
-	$answer->{'value'} = "off"};
+         $answer->{'value'} = "off";
       }
     }
   }
