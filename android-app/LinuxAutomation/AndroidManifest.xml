@@ -5,8 +5,8 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="19" />
+        android:minSdkVersion="10"
+        android:targetSdkVersion="11" />
 
     <application
         android:allowBackup="true"
@@ -21,6 +21,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+		<activity android:name="org.gunnm.linuxautomation.SettingsActivity" android:label="@string/action_settings"
+		        android:screenOrientation="nosensor">
+
+		</activity>
     </application>
 
 </manifest>
