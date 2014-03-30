@@ -11,14 +11,40 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 
 class RequestTask extends AsyncTask<String, String, String>{
+	private Context context = null;
+	private RequestType requestType = null;
+	
+	public void setContext (Context c)
+	{
+		this.context = c;
+	}
+	
+	public void setRequestType (RequestType rt)
+	{
+		this.requestType = rt;
+	} 
+	
+    protected String doInBackground(String... uri) 
+    {
+    	if (context == null)
+    	{
+    		Log.d ("RequestTask" , "context is null, not trying to issue a request");
+    	}
+    	if (context == null)
+    	{
+    		Log.d ("RequestTask" , "requesttask is null");
+    	}
+    	String serverString = PrefsUtils.getHostname (this.context);
+  		int port = PrefsUtils.getPort (this.context);
 
-    @Override
-    protected String doInBackground(String... uri) {
+  		Log.d("bla", "trying to connect on " + serverString + ":" + port);
+  	
         HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = null;

@@ -19,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -28,7 +30,17 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        
+        final Button button = (Button) findViewById(R.id.button_activate);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                Log.d ("MainActivity", "click on button");
+//                ImageView img= (ImageView) findViewById(R.id.Status);
+//                img.setImageResource(R.drawable.ok);
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -51,16 +63,9 @@ public class MainActivity extends Activity {
     	  	}
     	  	case R.id.refresh:
     	  	{
-    	  		String serverString;
-    	  		String portString;
-    	  		int port;
-    	  		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	  
-    	  		serverString = prefs.getString ("server_addr", "none");
-    	  		portString   = prefs.getString ("server_port", "1234");
-    	  		Log.d("bla", "trying to connect on " + serverString + ":" + portString);
-    	  		new RequestTask().execute("http://stackoverflow.com");
-    	  		
+    	  		RequestTask rt = new RequestTask();
+    	  		rt.setContext(this);
+    	  		rt.setRequestType (RequestType.GET_GLOBAL_STATE);
     	  		return true;
     	  	}
     	  }
