@@ -1,5 +1,7 @@
 package org.gunnm.linuxautomation;
 
+import org.gunnm.linuxautomation.Utils.ServerStatus;
+
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,10 +26,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-
+	public static MainActivity instance;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
+    	instance = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
@@ -37,8 +41,29 @@ public class MainActivity extends Activity {
             public void onClick(View v)
             {
                 Log.d ("MainActivity", "click on button");
-//                ImageView img= (ImageView) findViewById(R.id.Status);
-//                img.setImageResource(R.drawable.ok);
+
+            	RequestTask rt = new RequestTask();
+    	  		rt.setActivity(MainActivity.instance);
+    	  		
+    	  		/**
+    	  		 * If the server is active, the user pushes the button
+    	  		 * to turn it off.
+    	  		 */
+                if (Utils.getStatus() == ServerStatus.ACTIVE)
+                {
+                	rt.setRequestType (RequestType.SET_GLOBAL_STATE_OFF);
+                }
+                
+                /**
+                 * If the server is currently inactive, the user
+                 * push the button to make it active.
+                 */
+                if (Utils.getStatus() == ServerStatus.INACTIVE)
+                {
+                	rt.setRequestType (RequestType.SET_GLOBAL_STATE_ON);
+                }
+                
+               rt.execute();
             }
         });
     }
@@ -64,8 +89,9 @@ public class MainActivity extends Activity {
     	  	case R.id.refresh:
     	  	{
     	  		RequestTask rt = new RequestTask();
-    	  		rt.setContext(this);
+    	  		rt.setActivity(this);
     	  		rt.setRequestType (RequestType.GET_GLOBAL_STATE);
+    	  		rt.execute();
     	  		return true;
     	  	}
     	  }
