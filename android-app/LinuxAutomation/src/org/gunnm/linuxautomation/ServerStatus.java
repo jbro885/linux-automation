@@ -3,13 +3,13 @@ package org.gunnm.linuxautomation;
 public class ServerStatus {
 	private static boolean running = false;
 	
-	public void setRunning (boolean b)
+	public static void setRunning (boolean b)
 	{
-		this.running = b;
+		running = b;
 	}
 	
-	public boolean isRunning ()
+	public static boolean isRunning ()
 	{
-		return this.running;
+		return running;
 	}
 }

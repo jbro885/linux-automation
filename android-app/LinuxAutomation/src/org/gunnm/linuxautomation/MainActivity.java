@@ -1,7 +1,5 @@
 package org.gunnm.linuxautomation;
 
-import org.gunnm.linuxautomation.Utils.ServerStatus;
-
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,13 +26,19 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	public static MainActivity instance;
 
+	private WebcamTask webcamTask;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
     	instance = this;
+    	
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        /**
+         * The button can activate/deactivate the webcam.
+         */
         final Button button = (Button) findViewById(R.id.button_activate);
         button.setOnClickListener(new View.OnClickListener()
         {
@@ -49,7 +53,7 @@ public class MainActivity extends Activity {
     	  		 * If the server is active, the user pushes the button
     	  		 * to turn it off.
     	  		 */
-                if (Utils.getStatus() == ServerStatus.ACTIVE)
+                if (ServerStatus.isRunning())
                 {
                 	rt.setRequestType (RequestType.SET_GLOBAL_STATE_OFF);
                 }
@@ -58,7 +62,7 @@ public class MainActivity extends Activity {
                  * If the server is currently inactive, the user
                  * push the button to make it active.
                  */
-                if (Utils.getStatus() == ServerStatus.INACTIVE)
+                if (! ServerStatus.isRunning())
                 {
                 	rt.setRequestType (RequestType.SET_GLOBAL_STATE_ON);
                 }
@@ -66,6 +70,8 @@ public class MainActivity extends Activity {
                rt.execute();
             }
         });
+        
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,6 +98,11 @@ public class MainActivity extends Activity {
     	  		rt.setActivity(this);
     	  		rt.setRequestType (RequestType.GET_GLOBAL_STATE);
     	  		rt.execute();
+    	  		
+    	        webcamTask = new WebcamTask();
+    	        webcamTask.setActivity(this);
+    	        webcamTask.execute("");
+    	        
     	  		return true;
     	  	}
     	  }
