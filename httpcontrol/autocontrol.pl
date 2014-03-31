@@ -38,11 +38,11 @@ sub server_connect
          );
    if (! defined ($socket))
    {
-         print "Cannot connect to $AUTOMATED_SERVER_ADDR:$AUTOMATED_SERVER_PORT\n";
-         exit 0;
+#         print "Cannot connect to $AUTOMATED_SERVER_ADDR:$AUTOMATED_SERVER_PORT\n";
+         return 0;
    }
    $is_connected = 1;
-   print "connected to the server\n";
+#   print "connected to the server\n";
    return 1;
 }
 
@@ -64,7 +64,7 @@ sub send_str
    server_connect ();
 
    $size = $socket->send($str);
-   print "have sent $size\n";
+#   print "have sent $size\n";
 
 # notify server that request has been sent
 #   shutdown($socket, 1);
@@ -135,12 +135,13 @@ sub handle_request
       #we can then use this variable when building the
       #string being sent to the daemon
       $tmp = "<request cmd=\"set-global-status\" value=\"$value\"/>\n";
-      print "sending $tmp";
+#      print "sending $tmp";
       send_str ($tmp);
       $tmp = receive_str ();
    }
 
-   print "received: |$tmp|\n";
+#   print "received: |$tmp|\n";
+   print $tmp;
 }
 
 
@@ -155,13 +156,18 @@ print "Content-Type: text/plain\n\n";
 
 if (check_request ($request, $value) == 0)
 {
-	print "invalid request\n";
+	print "<error type=\"invalid-request\"/>\n";
 	exit (1);
 }
 
 # connect to the server only
 # once we are sure the request is legit
-server_connect ();
+if (server_connect () == 0)
+{
+	print "<error type=\"noserver\"/>\n";
+   exit (1);
+}
+
 
 handle_request ($request, $value);
 
