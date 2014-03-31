@@ -134,7 +134,21 @@ while (1) { # forever
                      my $request = XMLin($buf,KeyAttr => { server => 'name' }, ForceArray => [ 'server', 'address' ]);
                      my $answer = build_answer ($request);
 
-                     if ( (! defined ($answer)) || (! defined ($answer->{'type'})) || ($answer->{'type'} eq "quit"))
+                     #here, we have either a bad answer or a request to quit
+                     if ($request->{'cmd'} eq "get-webcam-picture")
+                     {
+                        open MYFILE , "/tmp/pic.png";
+                        while (<MYFILE>)
+                        {
+                           print $rh $_;
+                           $rh->flush;
+                        }
+                        close MYFILE;
+
+                        $Read_Handles_Object->remove($rh);
+                        close($rh);
+                     }
+                     elsif ( (! defined ($answer)) || (! defined ($answer->{'type'})) || ($answer->{'type'} eq "quit"))
                      {
                         $Read_Handles_Object->remove($rh);
                         close($rh);
