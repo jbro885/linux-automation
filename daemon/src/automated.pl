@@ -56,9 +56,10 @@ sub build_answer
    }
    elsif ($request->{'cmd'} eq "set-global-status")
    {
+
+      $answer->{'type'} = "global-status";
       if ($request->{'value'} eq "on")
       {
-         $answer->{'type'} = "global-status";
 
          if (start_global () == 1)
          {      
@@ -101,9 +102,7 @@ $Read_Handles_Object->add($server_socket); # add the main socket to the set
 
 while (1) { # forever
 
-
-   while (1) 
-   { 
+print "bla\n";
       ($readable_handles) = IO::Select->select($Read_Handles_Object, undef, undef, 100);
 
       foreach $rh (@{$readable_handles}) 
@@ -117,12 +116,7 @@ while (1) { # forever
          {
             while (defined ($rh) && defined (fileno ($rh)) && (fileno ($rh) != -1 ) && ($buf = <$rh>))
             {
-               if (! defined $buf) 
-               {
-                  $Read_Handles_Object->remove($rh);
-                  close($rh);
-               }
-               else
+               if (defined $buf) 
                {
                   if (is_valid_request ($buf) != 1)
                   {
@@ -132,7 +126,6 @@ while (1) { # forever
                   else
                   {
                      my $request = XMLin($buf,KeyAttr => { server => 'name' }, ForceArray => [ 'server', 'address' ]);
-                     my $answer = build_answer ($request);
 
                      #here, we have either a bad answer or a request to quit
                      if ($request->{'cmd'} eq "get-webcam-picture")
@@ -145,28 +138,29 @@ while (1) { # forever
                         }
                         close MYFILE;
 
-                        $Read_Handles_Object->remove($rh);
-                        close($rh);
-                     }
-                     elsif ( (! defined ($answer)) || (! defined ($answer->{'type'})) || ($answer->{'type'} eq "quit"))
-                     {
-                        $Read_Handles_Object->remove($rh);
-                        close($rh);
                      }
                      else
                      {
-                        my $output = XMLout ($answer,KeyAttr => { server => 'answer' }) . "\n";
-                        print $rh $output;
+                        my $answer = build_answer ($request);
+                        if ( (! defined ($answer)) || (! defined ($answer->{'type'})) || ($answer->{'type'} eq "quit"))
+                        {
+                           print "";
+                        }
+                        else
+                        {
+                           my $output = XMLout ($answer,KeyAttr => { server => 'answer' }) . "\n";
+                           print $rh $output;
 
-                        $rh->flush;
+                           $rh->flush;
 
-                        $Read_Handles_Object->remove($rh);
-                        close($rh);
+                        }
                      }
                   }
                }
+
+               $Read_Handles_Object->remove($rh);
+               close($rh);
             }
          }
       }
-   }
 }
