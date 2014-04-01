@@ -45,6 +45,7 @@ class WebcamTask extends AsyncTask<String, String, Bitmap>{
 		try {
 			InputStream in = new java.net.URL(url).openStream();
 			image = BitmapFactory.decodeStream(in);
+			in.close();
 		} catch (Exception e) {
 			Log.e("WebcamTask", "Error when trying to get the pic " + e.getMessage());
 		}
@@ -66,8 +67,9 @@ class WebcamTask extends AsyncTask<String, String, Bitmap>{
 		if (ServerStatus.isRunning())
 		{
 			Log.d ("WebcamTask" , "update pic");
+	  		String url = PrefsUtils.getHostname (this.relatedActivity) + "/" + PrefsUtils.getServerPath (this.relatedActivity) + "/autocontrol.pl?request=get-webcam-picture";
 
-			pic = loadBitMap(IMG_ACTIVE);
+			pic = loadBitMap(url);
 		}
 		else
 		{

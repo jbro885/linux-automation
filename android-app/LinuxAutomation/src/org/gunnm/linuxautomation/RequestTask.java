@@ -109,6 +109,7 @@ class RequestTask extends AsyncTask<String, String, String>{
         }
         catch (Exception e)
         {
+        	Log.d("RequestTask","result=" + result);
         	Utils.showError(relatedActivity, "Answer error", "Error when parsing the answer");
         	return;
         }
