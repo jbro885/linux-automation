@@ -146,7 +146,7 @@ sub handle_request
    {
       $tmp = "<request cmd=\"get-webcam-picture\"/>\n";
       send_str ($tmp);
-      print "Content-Type: image/png\n\n";
+      print "Content-Type: image/jpeg\n\n";
       while (<$socket>)
       {
          print $_;

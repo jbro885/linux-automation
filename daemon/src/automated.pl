@@ -39,6 +39,22 @@ sub is_valid_request
    return 0;
 }
 
+sub get_webcam_picture
+{
+use LWP::UserAgent;
+my $ua = LWP::UserAgent->new;
+$ua->agent("MyApp/0.1 ");
+$ua->timeout (1);
+
+my $res = $ua->get("http://192.168.1.4:8081");
+
+my $content = $res->content;
+my ($size) = $content =~ /Content-Length:\s*(\d+)/;
+my $length = length ($content);
+my $img = substr ($content, $length - $size - 2, $size);
+return $img;
+}
+
 sub build_answer
 {
    my $request = shift; 
@@ -100,23 +116,13 @@ die "Could not create socket: $!n" unless $server_socket;
 $Read_Handles_Object = new IO::Select(); # create handle set for reading
 $Read_Handles_Object->add($server_socket); # add the main socket to the set
 
-while (1) { # forever
+while (1) 
+{ # forever
 
-print "bla\n";
-      ($readable_handles) = IO::Select->select($Read_Handles_Object, undef, undef, 100);
-
-      foreach $rh (@{$readable_handles}) 
-      {
-         if ($rh == $server_socket) 
-         {
-            accept ($client, $server_socket);
-            $Read_Handles_Object->add($client);
-         }
-         else 
-         {
+        $rh = $server_socket->accept;
             while (defined ($rh) && defined (fileno ($rh)) && (fileno ($rh) != -1 ) && ($buf = <$rh>))
             {
-               if (defined $buf) 
+               if ((defined ($buf)) && (length ($buf) > 0 ) )
                {
                   if (is_valid_request ($buf) != 1)
                   {
@@ -130,13 +136,16 @@ print "bla\n";
                      #here, we have either a bad answer or a request to quit
                      if ($request->{'cmd'} eq "get-webcam-picture")
                      {
-                        open MYFILE , "/tmp/pic.png";
-                        while (<MYFILE>)
-                        {
-                           print $rh $_;
-                           $rh->flush;
-                        }
-                        close MYFILE;
+                        print $rh get_webcam_picture();
+                        $rh->flush;
+
+#                        open MYFILE , "/tmp/pic.png";
+#                        while (<MYFILE>)
+#                        {
+#                           print $rh $_;
+#                           $rh->flush;
+#                        }
+#                        close MYFILE;
 
                      }
                      else
@@ -157,10 +166,7 @@ print "bla\n";
                      }
                   }
                }
-
-               $Read_Handles_Object->remove($rh);
                close($rh);
             }
+
          }
-      }
-}
