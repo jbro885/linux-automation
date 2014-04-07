@@ -13,67 +13,85 @@ my $status;
 my $buf;
 sub start_global
 {
-  print "Starting the system globally\n";
-  return 1;
+   print "Starting the system globally\n";
+   return 1;
 }
 
 sub stop_global
 {
-  print "Stopping the system globally\n";
-  return 1;
+   print "Stopping the system globally\n";
+   return 1;
 }
 
 sub init
 {
-  $status->{'status'} = "on";
+   $status->{'status'} = "on";
 }
 
 
 sub is_valid_request
 {
-  my $buf = shift;
-  if ( is_well_formed_xml ($buf))
-  {
-    return 1;
-  }
-  return 0;
+   my $buf = shift;
+   if ( is_well_formed_xml ($buf))
+   {
+      return 1;
+   }
+   return 0;
+}
+
+sub get_webcam_picture
+{
+use LWP::UserAgent;
+my $ua = LWP::UserAgent->new;
+$ua->agent("MyApp/0.1 ");
+$ua->timeout (1);
+
+my $res = $ua->get("http://192.168.1.4:8081");
+
+my $content = $res->content;
+my ($size) = $content =~ /Content-Length:\s*(\d+)/;
+my $length = length ($content);
+my $img = substr ($content, $length - $size - 2, $size);
+return $img;
 }
 
 sub build_answer
 {
-  my $request = shift; 
-  my $answer;
-  
-  if ($request->{'cmd'} eq "get-global-status")
-  {
-    $answer->{'type'} = "global-status";
-    $answer->{'value'} = $status->{'status'};
-  }
-  elsif ($request->{'cmd'} eq "set-global-status")
-  {
-    if ($request->{'value'} eq "on")
-    {
+   my $request = shift; 
+   my $answer;
+
+   #By default, we assume the answer type
+   #will be quit. This ensures to define
+   #at least the type.
+   $answer->{'type'} = "quit";
+
+   if ($request->{'cmd'} eq "get-global-status")
+   {
       $answer->{'type'} = "global-status";
-      
-      if (start_global () == 1)
-      {      
-         $answer->{'value'} = "on";
-      }
-      
-    }
-    else
-    {
-      if (stop_global () == 1)
+      $answer->{'value'} = $status->{'status'};
+   }
+   elsif ($request->{'cmd'} eq "set-global-status")
+   {
+
+      $answer->{'type'} = "global-status";
+      if ($request->{'value'} eq "on")
       {
-         $answer->{'value'} = "off";
+
+         if (start_global () == 1)
+         {      
+            $answer->{'value'} = "on";
+         }
+
       }
-    }
-  }
-  else
-  {
-    $answer->{'type'} = "quit";
-  }
-  return $answer;
+      else
+      {
+         if (stop_global () == 1)
+         {
+            $answer->{'value'} = "off";
+         }
+      }
+   }
+   return $answer;
 }
 
 
@@ -84,13 +102,13 @@ sub build_answer
 init();
 
 my $server_socket = new IO::Socket::INET (
-  LocalHost => "localhost",
-  LocalPort => 1234,
-  Proto => 'tcp',
-  Listen => 1235,
-  Reuse => 1,
-  timeout => 5,
-);
+      LocalHost => "localhost",
+      LocalPort => 1234,
+      Proto => 'tcp',
+      Listen => 1235,
+      Reuse => 1,
+      timeout => 5,
+      );
 die "Could not create socket: $!n" unless $server_socket;
 
 #print "created socket $server_socket";
@@ -98,106 +116,57 @@ die "Could not create socket: $!n" unless $server_socket;
 $Read_Handles_Object = new IO::Select(); # create handle set for reading
 $Read_Handles_Object->add($server_socket); # add the main socket to the set
 
-while (1) { # forever
+while (1) 
+{ # forever
 
+        $rh = $server_socket->accept;
+            while (defined ($rh) && defined (fileno ($rh)) && (fileno ($rh) != -1 ) && ($buf = <$rh>))
+            {
+               if ((defined ($buf)) && (length ($buf) > 0 ) )
+               {
+                  if (is_valid_request ($buf) != 1)
+                  {
+                     $Read_Handles_Object->remove($rh);
+                     close($rh);
+                  }
+                  else
+                  {
+                     my $request = XMLin($buf,KeyAttr => { server => 'name' }, ForceArray => [ 'server', 'address' ]);
 
-  while (1) 
-  { # keep in this loop as long as there is a readable filehandle..
-  # get the set of readable handles
-  #
-    ($readable_handles) = IO::Select->select($Read_Handles_Object, undef, undef, 100);
+                     #here, we have either a bad answer or a request to quit
+                     if ($request->{'cmd'} eq "get-webcam-picture")
+                     {
+                        print $rh get_webcam_picture();
+                        $rh->flush;
 
-#    if (! defined ($readable_handles))
-#    {
-#      if (! scalar @$readable_handles)
-#      {
-#	print "nothing left to read...n";
-#	last
-#      }
- #   }
-    foreach $rh (@{$readable_handles}) 
-    {
-    #print "read handle found : '$rh'n";
-    # if it is the main socket then we have an incoming connection and
-    # we should accept() it and then add the new socket to the $Read_Handles_Object
-      if ($rh == $server_socket) 
-      {
-      # you get this when a new socket connection is formed..a new client starts and it assigns
-      # a socket filehandle to it.
-      #print " accept();
-	accept ($client, $server_socket);
-	$Read_Handles_Object->add($client);
-	$ClientNumber{$client}=++$CLIENT_COUNT;
-	#print " %%% Adding '$client' to read setn";
-      }
-# otherwise it is an ordinary socket and we should read and process the request
-      else 
-      {
-#print " --this is an ordinary socket '$rh'n";
-    
-    
-	while (defined ($rh) && defined (fileno ($rh)) && (fileno ($rh) != -1 ) && ($buf = <$rh>))
-	{
-	print "buf=$buf\n";
-	  # grab a line .. it shouldnt block due to the select
-	  if (! defined $buf) {
-	    # the other end of the socket closed...close our end and remove
-	    # it from the list of sockets to listen to..
-	    print " |FROM CLIENT ".$ClientNumber{$rh}."| --socket closed--n";
-	    $Read_Handles_Object->remove($rh);
-	    
-	    $CLIENT_COUNT = $CLIENT_COUNT - 1;
-	    close($rh);
-	  }
-	  else
-	  {
-	    if (is_valid_request ($buf) != 1)
-	    {
-	      print "bad request, closing\n";
-	      $Read_Handles_Object->remove($rh);
-	    
-	      $CLIENT_COUNT = $CLIENT_COUNT - 1;
-	      close($rh);
-	    }
-	    else
-	    {
-	      my $request = XMLin($buf,KeyAttr => { server => 'name' }, ForceArray => [ 'server', 'address' ]);
-	      print Dumper $request;
-	      my $answer = build_answer ($request);
-	      
-	      if ($answer->{'type'} eq "quit")
-	      {
-		print "quit answer, closing\n";
-	      
-		$Read_Handles_Object->remove($rh);
-	    
-		$CLIENT_COUNT = $CLIENT_COUNT - 1;
-		close($rh);
-	      }
-	      else
-	      {
-		print " |FROM CLIENT ".$ClientNumber{$rh}."|$buf";
-		my $output = XMLout ($answer,KeyAttr => { server => 'answer' }) . "\n";
-		print $rh $output;
-		print Dumper $answer;
-		print " |TO CLIENT ".$ClientNumber{$rh}."|$output";
+#                        open MYFILE , "/tmp/pic.png";
+#                        while (<MYFILE>)
+#                        {
+#                           print $rh $_;
+#                           $rh->flush;
+#                        }
+#                        close MYFILE;
 
-		$rh->flush;
-		
-		$Read_Handles_Object->remove($rh);
-		$CLIENT_COUNT = $CLIENT_COUNT - 1;
-		close($rh);
-	      }
-	   }
-	  }
-	}
-      }
-    }
-  }
+                     }
+                     else
+                     {
+                        my $answer = build_answer ($request);
+                        if ( (! defined ($answer)) || (! defined ($answer->{'type'})) || ($answer->{'type'} eq "quit"))
+                        {
+                           print "";
+                        }
+                        else
+                        {
+                           my $output = XMLout ($answer,KeyAttr => { server => 'answer' }) . "\n";
+                           print $rh $output;
 
+                           $rh->flush;
 
-# after going through the sockets I'll get back to some other work
-# .. I'll simulate that with a sleep 3 ..
+                        }
+                     }
+                  }
+               }
+               close($rh);
+            }
 
-
-}
+         }
