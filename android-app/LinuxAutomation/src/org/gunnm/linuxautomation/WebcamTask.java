@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,9 +32,7 @@ import android.widget.ImageView;
 
 class WebcamTask extends AsyncTask<String, String, Bitmap>{
 	private Activity relatedActivity = null;
-	private static String IMG_INACTIVE = "";
-	private static String IMG_ACTIVE   = "http://www.hazecam.net/images/main/newark.jpg";
-	
+
 
 	public void setActivity (Activity a)
 	{
@@ -42,12 +42,30 @@ class WebcamTask extends AsyncTask<String, String, Bitmap>{
 	private Bitmap loadBitMap (String url)
 	{
 		Bitmap image = null;
+		InputStream in = null;
+		
 		try {
-			InputStream in = new java.net.URL(url).openStream();
+
+	    	final String serverUser = PrefsUtils.getServerUser (this.relatedActivity);
+	    	final String serverPass = PrefsUtils.getServerPass (this.relatedActivity);
+			Authenticator.setDefault (new Authenticator() {
+			    protected PasswordAuthentication getPasswordAuthentication() {
+			        return new PasswordAuthentication (serverUser, serverPass.toCharArray());
+			    }
+			});
+			java.net.URL javaURL = new java.net.URL(url);
+			in = javaURL.openStream();
 			image = BitmapFactory.decodeStream(in);
 			in.close();
 		} catch (Exception e) {
 			Log.e("WebcamTask", "Error when trying to get the pic " + e.getMessage());
+
+			try {
+				in.close();
+			} catch (IOException e1) {
+				Log.e("WebcamTask", "cannot close " + e.getMessage());
+			}
+
 		}
 		return image;
 	}

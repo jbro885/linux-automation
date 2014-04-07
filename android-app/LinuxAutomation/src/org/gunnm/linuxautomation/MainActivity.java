@@ -26,7 +26,6 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	public static MainActivity instance;
 
-	private WebcamTask webcamTask;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -71,6 +70,27 @@ public class MainActivity extends Activity {
             }
         });
         
+        /**
+         * When we click on the webcam area on the phone, it updates
+         * the picture in the application.
+         */
+    	ImageView webcam = (ImageView) findViewById(R.id.webcam_view);
+    	webcam.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                if (ServerStatus.isRunning())
+                {
+                	WebcamTask webcamTask;
+
+        	        webcamTask = new WebcamTask();
+        	        webcamTask.setActivity(instance);
+        	        webcamTask.execute("");
+
+                }          
+            }
+        });
+        
 
     }
 
@@ -95,14 +115,15 @@ public class MainActivity extends Activity {
     	  	case R.id.refresh:
     	  	{
     	  		RequestTask rt = new RequestTask();
-    	  		rt.setActivity(this);
+    	  		rt.setActivity(instance);
     	  		rt.setRequestType (RequestType.GET_GLOBAL_STATE);
     	  		rt.execute();
-    	  		
+
+    	  		WebcamTask webcamTask;
     	        webcamTask = new WebcamTask();
-    	        webcamTask.setActivity(this);
+    	        webcamTask.setActivity(instance);
     	        webcamTask.execute("");
-    	        
+
     	  		return true;
     	  	}
     	  }

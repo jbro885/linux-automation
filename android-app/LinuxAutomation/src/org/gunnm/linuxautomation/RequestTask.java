@@ -10,6 +10,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -27,7 +29,7 @@ import android.util.Log;
 class RequestTask extends AsyncTask<String, String, String>{
 	private Activity relatedActivity = null;
 	private RequestType requestType = null;
-	
+	private String errMessage = null;
 
 	
 	public void setActivity (Activity a)
@@ -62,31 +64,39 @@ class RequestTask extends AsyncTask<String, String, String>{
     	
     	String serverString = PrefsUtils.getHostname (this.relatedActivity);
     	String serverPath = PrefsUtils.getServerPath (this.relatedActivity);
+    	String serverUser = PrefsUtils.getServerUser (this.relatedActivity);
+    	String serverPass = PrefsUtils.getServerPass (this.relatedActivity);
+
   		int port = PrefsUtils.getPort (this.relatedActivity);
   		String url = serverString + "/" + serverPath + "/autocontrol.pl?" + Utils.mapRequestTypeToHttpPost(this.requestType);
-  		Log.d("bla", "trying to get " + url);
-  	
-        HttpClient httpclient = new DefaultHttpClient();
+  		Log.d("[RequestTask]", "trying to get " + url);
+  		Log.d("[RequestTask]", "username=" + serverUser);
+  		Log.d("[RequestTask]", "userpass=" + serverPass);
+  		DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = null;
         try {
+            httpclient.getCredentialsProvider().setCredentials (new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(serverUser, serverPass));
             response = httpclient.execute(new HttpGet(url));
             StatusLine statusLine = response.getStatusLine();
+            Log.d ("[RequestTask]", "status code" + statusLine.getStatusCode());
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 response.getEntity().writeTo(out);
                 out.close();
                 responseString = out.toString();
-            } else{
+            }
+            else
+            {
                 //Closes the connection.
                 response.getEntity().getContent().close();
-                throw new IOException(statusLine.getReasonPhrase());
+
+            	errMessage = " http error, code=" + statusLine.getStatusCode();
             }
         } catch (ClientProtocolException e) {
-        	Utils.showError(relatedActivity, "Protocol Error", "Protocol Error");
+        	errMessage = e.getMessage();
         } catch (IOException e) {
-        	Utils.showError(relatedActivity, "IO Error", "Error when trying to connect");
-
+        	errMessage = e.getMessage();
         }
         return responseString;
     }
@@ -94,22 +104,27 @@ class RequestTask extends AsyncTask<String, String, String>{
     @Override
     protected void onPostExecute(String result) {
     	Document xmldoc = null;
-    	
     	super.onPostExecute(result);
-        
+
     	if (result == null)
     	{
-        	Utils.showError(relatedActivity, "No answer", "No answer when contacting the server");
+    		String msg = "No answer when contacting the server";
+    		if (errMessage != null)
+    		{
+    			msg = errMessage;
+    		}
+        	Utils.showError(relatedActivity, "Connection Error", msg);
         	return;
     	}
-    	
+
         try
         {
         	xmldoc = loadXMLFromString(result);
+
         }
         catch (Exception e)
         {
-        	Log.d("RequestTask","result=" + result);
+//        	Log.d("RequestTask","result=" + result);
         	Utils.showError(relatedActivity, "Answer error", "Error when parsing the answer");
         	return;
         }

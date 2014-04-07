@@ -22,6 +22,18 @@ public class PrefsUtils {
 		return prefs.getString ("server_addr", "none");
 	}
 	
+	public static String getServerUser (Context context)
+	{
+		checkSharedPreferences (context);
+		return prefs.getString ("server_user", "none");
+	}
+	
+	public static String getServerPass (Context context)
+	{
+		checkSharedPreferences (context);
+		return prefs.getString ("server_pass", "none");
+	}
+	
 	public static String getServerPath (Context context)
 	{
 		checkSharedPreferences (context);
