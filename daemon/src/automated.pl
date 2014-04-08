@@ -46,10 +46,15 @@ my $ua = LWP::UserAgent->new;
 $ua->agent("MyApp/0.1 ");
 $ua->timeout (1);
 
-my $res = $ua->get("http://192.168.1.4:8081");
+my $res = $ua->get("http://127.0.0.1:8081");
 
 my $content = $res->content;
 my ($size) = $content =~ /Content-Length:\s*(\d+)/;
+if (! defined ($size))
+{
+   print "size is not defined\n";
+   return "";
+}
 my $length = length ($content);
 my $img = substr ($content, $length - $size - 2, $size);
 return $img;
