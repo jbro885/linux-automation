@@ -1,32 +1,14 @@
-package org.gunnm.linuxautomation;
+package org.gunnm.openhomeautomation;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.ImageView;
 
 
@@ -58,12 +40,12 @@ class WebcamTask extends AsyncTask<String, String, Bitmap>{
 			image = BitmapFactory.decodeStream(in);
 			in.close();
 		} catch (Exception e) {
-			Log.e("WebcamTask", "Error when trying to get the pic " + e.getMessage());
+//			Log.e("WebcamTask", "Error when trying to get the pic " + e.getMessage());
 
 			try {
 				in.close();
 			} catch (IOException e1) {
-				Log.e("WebcamTask", "cannot close " + e.getMessage());
+//				Log.e("WebcamTask", "cannot close " + e.getMessage());
 			}
 
 		}
@@ -78,20 +60,21 @@ class WebcamTask extends AsyncTask<String, String, Bitmap>{
 
 		if (this.relatedActivity == null)
 		{
-			Log.d ("WebcamTask" , "context is null, not trying to issue a request");
+//			Log.d ("WebcamTask" , "context is null, not trying to issue a request");
 			return null;
 		}
 
 		if (ServerStatus.isRunning())
 		{
-			Log.d ("WebcamTask" , "update pic");
-	  		String url = PrefsUtils.getHostname (this.relatedActivity) + "/" + PrefsUtils.getServerPath (this.relatedActivity) + "/autocontrol.pl?request=get-webcam-picture";
+//			Log.d ("WebcamTask" , "update pic");
+	  		String url = PrefsUtils.getHostname (this.relatedActivity) + ":" + PrefsUtils.getPort(this.relatedActivity) +"/" + PrefsUtils.getServerPath (this.relatedActivity) + "/autocontrol.pl?request=get-webcam-picture";
+	  		
 
 			pic = loadBitMap(url);
 		}
 		else
 		{
-			Log.d ("WebcamTask" , "NOT update pic");
+//			Log.d ("WebcamTask" , "NOT update pic");
 
 		}
 		return pic;

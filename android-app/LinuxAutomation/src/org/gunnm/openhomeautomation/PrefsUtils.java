@@ -1,4 +1,4 @@
-package org.gunnm.linuxautomation;
+package org.gunnm.openhomeautomation;
 
 import android.content.Context;
 import android.content.SharedPreferences;

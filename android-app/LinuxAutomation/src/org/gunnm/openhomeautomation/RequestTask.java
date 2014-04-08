@@ -1,4 +1,4 @@
-package org.gunnm.linuxautomation;
+package org.gunnm.openhomeautomation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,7 +13,6 @@ import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.w3c.dom.Document;
@@ -21,9 +20,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 
 class RequestTask extends AsyncTask<String, String, String>{
@@ -55,11 +52,13 @@ class RequestTask extends AsyncTask<String, String, String>{
     	
     	if (this.relatedActivity == null)
     	{
-    		Log.d ("RequestTask" , "context is null, not trying to issue a request");
+//    		Log.d ("RequestTask" , "context is null, not trying to issue a request");
+    		return null;
     	}
     	if (this.requestType == null)
     	{
-    		Log.d ("RequestTask" , "requesttask is null");
+//    		Log.d ("RequestTask" , "requesttask is null");
+    		return null;
     	}
     	
     	String serverString = PrefsUtils.getHostname (this.relatedActivity);
@@ -68,10 +67,10 @@ class RequestTask extends AsyncTask<String, String, String>{
     	String serverPass = PrefsUtils.getServerPass (this.relatedActivity);
 
   		int port = PrefsUtils.getPort (this.relatedActivity);
-  		String url = serverString + "/" + serverPath + "/autocontrol.pl?" + Utils.mapRequestTypeToHttpPost(this.requestType);
-  		Log.d("[RequestTask]", "trying to get " + url);
-  		Log.d("[RequestTask]", "username=" + serverUser);
-  		Log.d("[RequestTask]", "userpass=" + serverPass);
+  		String url = serverString + ":" + port + "/" + serverPath + "/autocontrol.pl?" + Utils.mapRequestTypeToHttpPost(this.requestType);
+//  		Log.d("[RequestTask]", "trying to get " + url);
+//  		Log.d("[RequestTask]", "username=" + serverUser);
+//  		Log.d("[RequestTask]", "userpass=" + serverPass);
   		DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = null;
@@ -79,7 +78,7 @@ class RequestTask extends AsyncTask<String, String, String>{
             httpclient.getCredentialsProvider().setCredentials (new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(serverUser, serverPass));
             response = httpclient.execute(new HttpGet(url));
             StatusLine statusLine = response.getStatusLine();
-            Log.d ("[RequestTask]", "status code" + statusLine.getStatusCode());
+//            Log.d ("[RequestTask]", "status code" + statusLine.getStatusCode());
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 response.getEntity().writeTo(out);
@@ -144,7 +143,7 @@ class RequestTask extends AsyncTask<String, String, String>{
     		Node attr = node.getAttributes().getNamedItem("type");
     		if (attr != null)
     		{
-    			Log.d("RequestTask", "BLA" + attr.getNodeValue());
+//    			Log.d("RequestTask", "BLA" + attr.getNodeValue());
     			if (attr.getNodeValue().equalsIgnoreCase("noserver"))
     			{
     		  		Utils.showError(relatedActivity, "Unavailable", "Server is not available");
@@ -164,7 +163,7 @@ class RequestTask extends AsyncTask<String, String, String>{
         {
         	case GET_GLOBAL_STATE:
         	{
-        		Log.d ("RequestTask", "node name: " + node.getNodeName());
+//        		Log.d ("RequestTask", "node name: " + node.getNodeName());
         		Node attr = node.getAttributes().getNamedItem("value");
         		if (attr != null)
         		{
@@ -181,7 +180,7 @@ class RequestTask extends AsyncTask<String, String, String>{
         	}
         	case SET_GLOBAL_STATE_ON:
         	{
-        		Log.d ("RequestTask", "node name: " + node.getNodeName());
+//        		Log.d ("RequestTask", "node name: " + node.getNodeName());
         		Node attr = node.getAttributes().getNamedItem("value");
         		if (attr != null)
         		{
@@ -200,7 +199,7 @@ class RequestTask extends AsyncTask<String, String, String>{
         	}
         	case SET_GLOBAL_STATE_OFF:
         	{
-        		Log.d ("RequestTask", "node name: " + node.getNodeName());
+//        		Log.d ("RequestTask", "node name: " + node.getNodeName());
         		Node attr = node.getAttributes().getNamedItem("value");
         		if (attr != null)
         		{

@@ -1,4 +1,4 @@
-package org.gunnm.linuxautomation;
+package org.gunnm.openhomeautomation;
 
 public class ServerStatus {
 	private static boolean running = false;

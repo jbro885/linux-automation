@@ -1,4 +1,4 @@
-package org.gunnm.linuxautomation;
+package org.gunnm.openhomeautomation;
 
 public enum RequestType {
 	GET_GLOBAL_STATE,

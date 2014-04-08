@@ -1,27 +1,14 @@
-package org.gunnm.linuxautomation;
+package org.gunnm.openhomeautomation;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu; 
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	public static MainActivity instance;
@@ -43,7 +30,7 @@ public class MainActivity extends Activity {
         {
             public void onClick(View v)
             {
-                Log.d ("MainActivity", "click on button");
+//                Log.d ("MainActivity", "click on button");
 
             	RequestTask rt = new RequestTask();
     	  		rt.setActivity(MainActivity.instance);
@@ -108,7 +95,7 @@ public class MainActivity extends Activity {
     	  {
     	  	case R.id.settings:
     	  	{
-    	  		Intent i = new Intent(this, org.gunnm.linuxautomation.SettingsActivity.class);
+    	  		Intent i = new Intent(this, org.gunnm.openhomeautomation.SettingsActivity.class);
     	  		startActivity(i);
     	  		return true;
     	  	}
