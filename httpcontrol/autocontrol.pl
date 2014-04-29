@@ -8,9 +8,29 @@ use strict;
 ##################################################
 # CONFIGURATION VARIABLES
 ##################################################
+my $conf;
+$conf->{'AUTOMATED_ADDR'} = "127.0.0.1";
+$conf->{'AUTOMATED_PORT'} = "1234";
 
-my $AUTOMATED_SERVER_ADDR="localhost";
-my $AUTOMATED_SERVER_PORT="1234";
+
+##################################################
+# CONFIG FILE HANDLING
+##################################################
+
+sub read_config 
+{  
+
+   return if (! -f "/etc/automated.conf");
+
+   open MYFILE, "/etc/automated.conf";
+   while (my $line = <MYFILE>)
+   {
+      my ($key,$value) = $line =~ /([\w\d\_]+)=([\w\d\.\_]+)/;
+      $conf->{$key} = $value;
+   }
+
+   close MYFILE;
+}  
 
 
 ##################################################
@@ -31,8 +51,8 @@ sub server_connect
    }
 
    $socket = new IO::Socket::INET (
-         PeerHost => $AUTOMATED_SERVER_ADDR,
-         PeerPort => $AUTOMATED_SERVER_PORT,
+         PeerHost => $conf->{'AUTOMATED_ADDR'},
+         PeerPort => $conf->{'AUTOMATED_PORT'},
          Proto => 'tcp',
          Timeout => 1
          );

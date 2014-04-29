@@ -2,13 +2,13 @@
 
 ENABLE_EMAIL=0
 
-if [ -x /etc/laconfig ]; then
-	. /etc/laconfig
+if [ -x /etc/automated.conf ]; then
+	. /etc/automated.conf
 fi
 
 if [ "$ENABLE_EMAIL" = "1" ]; then
 	DATE=`date +%Y%m%d-%H%M`
-	ALERT="Motion detected at $DATE see $WEBCAM_URL for more details and information."
+	ALERT="Motion detected at $DATE check picture for more details and information."
 	for addr in $RECIPIENTS; do
 		echo "$ALERT" | mail -s "MOTION ALERT on $SYSTEM_NAME" $addr
 	done
