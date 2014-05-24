@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 public class PrefsUtils {
 
 	private static SharedPreferences prefs = null;
+	public static int MIN_REFRESH = 5;
 	
 	private static void checkSharedPreferences (Context c)
 	{
@@ -35,6 +36,11 @@ public class PrefsUtils {
 		catch (NumberFormatException nfe)
 		{
 			v = 0;
+		}
+		
+		if ( (v != 0) &&  (v < MIN_REFRESH))
+		{
+			v = MIN_REFRESH;
 		}
 		return v;
 	}

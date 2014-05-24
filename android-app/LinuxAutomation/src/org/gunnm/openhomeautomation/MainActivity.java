@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
 	public static MainActivity instance;
 	public static final int ONE_SECOND = 1000;
 	
-	
+	private boolean updateInProgress = false;
 	private Handler mHandler = new Handler();
     
 	
@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
         {
         	int refresh = PrefsUtils.getRefreshPeriod (instance);
         	
-	        if (refresh != 0)
+	        if ((refresh != 0) && (ServerStatus.isRunning()))
 	        {
 //	            Log.d("PeriodicTimerService","Awake");
 	        	refreshStatus();
@@ -122,8 +122,14 @@ public class MainActivity extends Activity {
 
     }
     
-    private void refreshStatus ()
+    private synchronized void refreshStatus ()
     {
+    	if (updateInProgress)
+    	{
+    		return;
+    	}
+    	updateInProgress = true;
+    	
   		RequestTask rt = new RequestTask();
   		rt.setActivity(instance);
   		rt.setRequestType (RequestType.GET_GLOBAL_STATE);
@@ -133,6 +139,7 @@ public class MainActivity extends Activity {
         webcamTask = new WebcamTask();
         webcamTask.setActivity(instance);
         webcamTask.execute("");
+        updateInProgress = false;
 
     }
 
