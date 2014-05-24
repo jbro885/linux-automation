@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,7 +27,7 @@ public class MainActivity extends Activity {
         	
 	        if (refresh != 0)
 	        {
-	            Log.d("PeriodicTimerService","Awake");
+//	            Log.d("PeriodicTimerService","Awake");
 	        	refreshStatus();
 	            
         	}
