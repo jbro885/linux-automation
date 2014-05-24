@@ -4,5 +4,6 @@
    <EditTextPreference android:title="Automation Server Port" android:key="server_port" android:summary="Server Port" android:defaultValue="8080"/>
    <EditTextPreference android:title="Automation Server User" android:key="server_user" android:summary="Username" android:defaultValue="username"/>
    <EditTextPreference android:title="Automation Server Pass" android:key="server_pass" android:summary="Password" android:defaultValue="password"/>
-   <EditTextPreference android:title="Automation Server Path" android:key="server_path" android:summary="Server Path" android:defaultValue="httpcontrol"/>
+   <EditTextPreference android:title="Refresh Period" 		  android:key="refresh_period" android:summary="Refresh Period (sec)" android:defaultValue="10"/>
+
 </PreferenceScreen>

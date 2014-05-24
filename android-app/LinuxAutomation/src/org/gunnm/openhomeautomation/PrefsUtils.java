@@ -22,6 +22,23 @@ public class PrefsUtils {
 		return prefs.getString ("server_addr", "none");
 	}
 	
+	public static int getRefreshPeriod (Context context)
+	{
+		int v = 0;
+		
+		checkSharedPreferences (context);
+		String n = prefs.getString ("refresh_period", "10");
+		try
+		{
+			v = Integer.parseInt(n);
+		}
+		catch (NumberFormatException nfe)
+		{
+			v = 0;
+		}
+		return v;
+	}
+	
 	public static String getServerUser (Context context)
 	{
 		checkSharedPreferences (context);

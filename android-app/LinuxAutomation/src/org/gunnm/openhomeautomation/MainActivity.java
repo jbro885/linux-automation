@@ -3,6 +3,8 @@ package org.gunnm.openhomeautomation;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,8 +14,47 @@ import android.widget.ImageView;
 
 public class MainActivity extends Activity {
 	public static MainActivity instance;
-
+	public static final int ONE_SECOND = 1000;
 	
+	
+	private Handler mHandler = new Handler();
+    
+	
+	private Runnable periodicTask = new Runnable()
+	{
+        public void run()
+        {
+        	int refresh = PrefsUtils.getRefreshPeriod (instance);
+        	
+	        if (refresh != 0)
+	        {
+	            Log.d("PeriodicTimerService","Awake");
+	        	refreshStatus();
+	            
+        	}
+	        if (refresh == 0)
+	        {
+	        	refresh = 10;
+	        }
+	        
+	        mHandler.postDelayed(periodicTask, refresh * ONE_SECOND);
+        }
+    };
+	
+    public void onStart()
+    {
+       super.onStart();
+       refreshStatus();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacks(periodicTask);
+//        Toast.makeText(this, "Service onDestroy() ", Toast.LENGTH_LONG).show();
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -78,6 +119,21 @@ public class MainActivity extends Activity {
             }
         });
         
+    	mHandler.postDelayed(periodicTask, ONE_SECOND * 2);
+
+    }
+    
+    private void refreshStatus ()
+    {
+  		RequestTask rt = new RequestTask();
+  		rt.setActivity(instance);
+  		rt.setRequestType (RequestType.GET_GLOBAL_STATE);
+  		rt.execute();
+
+  		WebcamTask webcamTask;
+        webcamTask = new WebcamTask();
+        webcamTask.setActivity(instance);
+        webcamTask.execute("");
 
     }
 
@@ -101,15 +157,7 @@ public class MainActivity extends Activity {
     	  	}
     	  	case R.id.refresh:
     	  	{
-    	  		RequestTask rt = new RequestTask();
-    	  		rt.setActivity(instance);
-    	  		rt.setRequestType (RequestType.GET_GLOBAL_STATE);
-    	  		rt.execute();
-
-    	  		WebcamTask webcamTask;
-    	        webcamTask = new WebcamTask();
-    	        webcamTask.setActivity(instance);
-    	        webcamTask.execute("");
+    	  		refreshStatus();
 
     	  		return true;
     	  	}
