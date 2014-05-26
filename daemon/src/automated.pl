@@ -67,6 +67,7 @@ sub stop_global
 sub init
 {
    $status->{'status'} = "on";
+   start_global ();
 }
 
 
