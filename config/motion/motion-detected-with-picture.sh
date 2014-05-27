@@ -39,7 +39,7 @@ if [ "$ENABLE_EMAIL" = "1" ]; then
 	DATE=`date +%Y%m%d-%H%M`
 	ALERT="Motion detected at $DATE check picture for more details and information."
 	for addr in $RECIPIENTS; do
-		echo "$ALERT" | mail -s "MOTION ALERT on $SYSTEM_NAME" $addr -a $1
+		echo "$ALERT" | mail -s "MOTION ALERT on $SYSTEM_NAME" -a $1 $addr
 	done
 	rm -f ${TMPFILE}
 	touch ${TMPFILE}
