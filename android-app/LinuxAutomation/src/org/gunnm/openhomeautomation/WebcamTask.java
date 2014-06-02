@@ -9,16 +9,32 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 
 class WebcamTask extends AsyncTask<String, String, Bitmap>{
 	private Activity relatedActivity = null;
 
+	private ProgressBar progressBar = null;
 
 	public void setActivity (Activity a)
 	{
 		this.relatedActivity = a;
+	}
+	
+	public void setProgressBar (ProgressBar pb)
+	{
+		this.progressBar = pb;
+	}
+	
+	protected void onPreExecute()
+	{
+		if (progressBar != null)
+		{
+	        progressBar.setVisibility(View.VISIBLE);
+		}
 	}
 
 	private Bitmap loadBitMap (String url)
@@ -80,7 +96,13 @@ class WebcamTask extends AsyncTask<String, String, Bitmap>{
 		return pic;
 	}
 	
-    protected void onPostExecute(Bitmap result) {
+    protected void onPostExecute(Bitmap result)
+    {
+    	if (progressBar != null)
+    	{
+    		progressBar.setVisibility(View.GONE);
+    	}
+    	
     	ImageView webcam = (ImageView) this.relatedActivity.findViewById(R.id.webcam_view);
         webcam.setImageBitmap(result);
     }

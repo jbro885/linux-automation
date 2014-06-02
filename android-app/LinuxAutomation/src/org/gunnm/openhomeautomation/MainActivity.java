@@ -4,21 +4,24 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 public class MainActivity extends Activity {
 	public static MainActivity instance;
 	public static final int ONE_SECOND = 1000;
 	
 	private boolean updateInProgress = false;
-	private Handler mHandler = new Handler();
-    
 	
+	private Handler mHandler = new Handler();
+	
+		
 	private Runnable periodicTask = new Runnable()
 	{
         public void run()
@@ -27,10 +30,10 @@ public class MainActivity extends Activity {
         	
 	        if ((refresh != 0) && (ServerStatus.isRunning()))
 	        {
-//	            Log.d("PeriodicTimerService","Awake");
-	        	refreshStatus();
-	            
+	            Log.d("PeriodicTimerService","Awake");
+	        	refreshWebcam();
         	}
+	        
 	        if (refresh == 0)
 	        {
 	        	refresh = 10;
@@ -43,7 +46,6 @@ public class MainActivity extends Activity {
     public void onStart()
     {
        super.onStart();
-       refreshStatus();
     }
 
 
@@ -70,9 +72,9 @@ public class MainActivity extends Activity {
         {
             public void onClick(View v)
             {
-//                Log.d ("MainActivity", "click on button");
-
             	RequestTask rt = new RequestTask();
+          		ProgressBar pb = (ProgressBar) instance.findViewById(R.id.progressBar);
+          		rt.setProgressBar(pb);
     	  		rt.setActivity(MainActivity.instance);
     	  		
     	  		/**
@@ -108,18 +110,20 @@ public class MainActivity extends Activity {
             {
                 if (ServerStatus.isRunning())
                 {
-                	WebcamTask webcamTask;
-
-        	        webcamTask = new WebcamTask();
-        	        webcamTask.setActivity(instance);
-        	        webcamTask.execute("");
-
+                	refreshWebcam();
                 }          
             }
         });
         
-    	mHandler.postDelayed(periodicTask, ONE_SECOND * 2);
-
+    	/**
+    	 * Refresh the actual status of the remote server.
+    	 */
+    	refreshStatus ();
+    	
+    	/*
+    	 * Create the handler that update the webcam view
+    	 */
+    	mHandler.postDelayed(periodicTask, ONE_SECOND);
     }
     
     private synchronized void refreshStatus ()
@@ -129,18 +133,49 @@ public class MainActivity extends Activity {
     		return;
     	}
     	updateInProgress = true;
+    
     	
   		RequestTask rt = new RequestTask();
+  		ProgressBar pb = (ProgressBar) this.findViewById(R.id.progressBar);
+  		rt.setProgressBar(pb);
   		rt.setActivity(instance);
   		rt.setRequestType (RequestType.GET_GLOBAL_STATE);
   		rt.execute();
 
+  		updateInProgress = false;
+
+    }
+    
+    
+    private synchronized void refreshWebcam ()
+    {
+    	/**
+    	 * If the remote server is not running,
+    	 * we do not update the webcam picture.
+    	 */
+    	if ( ! ServerStatus.isRunning())
+    	{
+    		return;
+    	}
+    	
+    	/**
+    	 * If an update is already in progress,
+    	 * we do not run the code and return.
+    	 */
+    	if (updateInProgress)
+    	{
+    		return;
+    	}
+    	
+    	updateInProgress = true;
   		WebcamTask webcamTask;
         webcamTask = new WebcamTask();
+		ProgressBar pb = (ProgressBar) this.findViewById(R.id.progressBar);
+		webcamTask.setProgressBar(pb);
         webcamTask.setActivity(instance);
         webcamTask.execute("");
+        
         updateInProgress = false;
-
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -164,6 +199,7 @@ public class MainActivity extends Activity {
     	  	case R.id.refresh:
     	  	{
     	  		refreshStatus();
+    	  		refreshWebcam();
 
     	  		return true;
     	  	}

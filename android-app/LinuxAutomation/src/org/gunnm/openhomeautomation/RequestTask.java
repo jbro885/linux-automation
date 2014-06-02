@@ -21,13 +21,15 @@ import org.xml.sax.InputSource;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.view.View;
+import android.widget.ProgressBar;
 
 
 class RequestTask extends AsyncTask<String, String, String>{
 	private Activity relatedActivity = null;
 	private RequestType requestType = null;
 	private String errMessage = null;
-
+	private ProgressBar progressBar = null;
 	
 	public void setActivity (Activity a)
 	{
@@ -37,6 +39,19 @@ class RequestTask extends AsyncTask<String, String, String>{
 	public void setRequestType (RequestType rt)
 	{
 		this.requestType = rt;
+	}
+	
+	public void setProgressBar (ProgressBar pb)
+	{
+		this.progressBar = pb;
+	}
+	
+	protected void onPreExecute()
+	{
+		if (progressBar != null)
+		{
+	        progressBar.setVisibility(View.VISIBLE);
+		}
 	}
 	
 	public static Document loadXMLFromString(String xml) throws Exception
@@ -104,7 +119,12 @@ class RequestTask extends AsyncTask<String, String, String>{
     protected void onPostExecute(String result) {
     	Document xmldoc = null;
     	super.onPostExecute(result);
-
+        
+    	if (progressBar != null)
+    	{
+    		progressBar.setVisibility(View.GONE);
+    	}
+    	
     	if (result == null)
     	{
     		String msg = "No answer when contacting the server";
