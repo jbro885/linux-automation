@@ -2,7 +2,7 @@
 
 ENABLE_EMAIL=0
 SEND=0
-TMPFILE=/tmp/automated-motion-sendmail
+TMPFILE=/tmp/automated-motion-sendmail-pic
 
 if [ -x /etc/automated.conf ]; then
 	. /etc/automated.conf
@@ -34,11 +34,12 @@ if [ "$ENABLE_EMAIL" = "1" ]; then
   else
     SEND=1
   fi
+
    if [ "$SEND" = "1" ]; then
 	DATE=`date +%Y%m%d-%H%M`
-	ALERT="Motion detected at $DATE"
+	ALERT="Motion detected at $DATE check picture for more details and information."
 	for addr in $RECIPIENTS; do
-		echo "$ALERT" | mail -s "MOTION ALERT on $SYSTEM_NAME" $addr
+		echo "$ALERT" | mail -s "MOTION ALERT on $SYSTEM_NAME" -a $1 $addr
 	done
 	rm -f ${TMPFILE}
 	touch ${TMPFILE}
