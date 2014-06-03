@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.text.DateFormat;
+import java.util.Calendar;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -12,13 +14,15 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 
 class WebcamTask extends AsyncTask<String, String, Bitmap>{
 	private Activity relatedActivity = null;
 
 	private ProgressBar progressBar = null;
-
+	private TextView    textView    = null;
+	
 	public void setActivity (Activity a)
 	{
 		this.relatedActivity = a;
@@ -29,11 +33,22 @@ class WebcamTask extends AsyncTask<String, String, Bitmap>{
 		this.progressBar = pb;
 	}
 	
+	
+	public void setTextView (TextView tv)
+	{
+		this.textView = tv;
+	}
+	
 	protected void onPreExecute()
 	{
 		if (progressBar != null)
 		{
 	        progressBar.setVisibility(View.VISIBLE);
+		}
+		
+		if (this.textView != null)
+		{
+			this.textView.setText("Updating picture ...");
 		}
 	}
 
@@ -102,7 +117,15 @@ class WebcamTask extends AsyncTask<String, String, Bitmap>{
     	{
     		progressBar.setVisibility(View.GONE);
     	}
-    	
+		
+    	if (this.textView != null)
+		{
+    		DateFormat dateFormat = DateFormat.getDateTimeInstance();
+    		Calendar cal = Calendar.getInstance();
+    		String str = "Last picture updated at " + dateFormat.format(cal.getTime());
+			this.textView.setText(str);
+		}
+		
     	ImageView webcam = (ImageView) this.relatedActivity.findViewById(R.id.webcam_view);
         webcam.setImageBitmap(result);
     }

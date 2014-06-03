@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+//import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	public static MainActivity instance;
@@ -30,7 +31,7 @@ public class MainActivity extends Activity {
         	
 	        if ((refresh != 0) && (ServerStatus.isRunning()))
 	        {
-	            Log.d("PeriodicTimerService","Awake");
+//	            Log.d("PeriodicTimerService","Awake");
 	        	refreshWebcam();
         	}
 	        
@@ -172,7 +173,12 @@ public class MainActivity extends Activity {
         webcamTask = new WebcamTask();
 		ProgressBar pb = (ProgressBar) this.findViewById(R.id.progressBar);
 		webcamTask.setProgressBar(pb);
-        webcamTask.setActivity(instance);
+        
+		TextView tv = (TextView) this.findViewById(R.id.infoText);
+		webcamTask.setTextView (tv);
+		
+		webcamTask.setActivity(instance);
+		
         webcamTask.execute("");
         
         updateInProgress = false;

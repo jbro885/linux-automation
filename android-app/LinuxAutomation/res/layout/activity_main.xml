@@ -37,15 +37,26 @@
         android:layout_height="wrap_content"/>
 
 	</LinearLayout>
+
+
         <ProgressBar
             android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleLarge"
+            style="?android:attr/progressBarStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true" 
             android:visibility="gone"
             android:indeterminateDrawable="@drawable/progress" >
         </ProgressBar>
+
+       	<TextView 
+        	android:id="@+id/infoText"
+        	android:layout_width="fill_parent" 
+        	android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true">
+    	</TextView>
+        
 </RelativeLayout>
 
