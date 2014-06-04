@@ -3,6 +3,7 @@ package org.gunnm.openhomeautomation;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+//import android.util.Log;
 
 public class PrefsUtils {
 
@@ -19,8 +20,16 @@ public class PrefsUtils {
 	
 	public static String getHostname (Context context)
 	{
+		String hostname;
 		checkSharedPreferences (context);
-		return prefs.getString ("server_addr", "none");
+		hostname = prefs.getString ("server_addr", null);
+		
+//		if (hostname == null)
+//		{
+//			Log.d("PrefsUtils", "value of hostname" + hostname);
+//		}
+		
+		return hostname;
 	}
 	
 	public static int getRefreshPeriod (Context context)

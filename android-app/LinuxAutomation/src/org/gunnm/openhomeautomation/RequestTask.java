@@ -21,6 +21,7 @@ import org.xml.sax.InputSource;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+//import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -81,7 +82,19 @@ class RequestTask extends AsyncTask<String, String, String>{
     	String serverUser = PrefsUtils.getServerUser (this.relatedActivity);
     	String serverPass = PrefsUtils.getServerPass (this.relatedActivity);
 
+    	if (serverString == null)
+    	{
+    		return null;
+    	}
+    	
+    	
   		int port = PrefsUtils.getPort (this.relatedActivity);
+  		
+    	if (port == 0)
+    	{
+    		return null;
+    	}
+  		
   		String url = serverString + ":" + port + "/" + serverPath + "/autocontrol.pl?" + Utils.mapRequestTypeToHttpPost(this.requestType);
 //  		Log.d("[RequestTask]", "trying to get " + url);
 //  		Log.d("[RequestTask]", "username=" + serverUser);
@@ -89,7 +102,8 @@ class RequestTask extends AsyncTask<String, String, String>{
   		DefaultHttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = null;
-        try {
+        try
+        {
             httpclient.getCredentialsProvider().setCredentials (new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), new UsernamePasswordCredentials(serverUser, serverPass));
             response = httpclient.execute(new HttpGet(url));
             StatusLine statusLine = response.getStatusLine();
@@ -104,12 +118,15 @@ class RequestTask extends AsyncTask<String, String, String>{
             {
                 //Closes the connection.
                 response.getEntity().getContent().close();
-
             	errMessage = " http error, code=" + statusLine.getStatusCode();
             }
-        } catch (ClientProtocolException e) {
+        } 
+        catch (ClientProtocolException e) 
+        {
         	errMessage = e.getMessage();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
         	errMessage = e.getMessage();
         }
         return responseString;
