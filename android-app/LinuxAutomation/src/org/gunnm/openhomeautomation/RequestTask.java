@@ -204,6 +204,7 @@ class RequestTask extends AsyncTask<String, String, String>{
         		Node attr = node.getAttributes().getNamedItem("value");
         		if (attr != null)
         		{
+//        			Log.d("RequestTask", "attr val=" + attr.getNodeValue());
         			if (attr.getNodeValue().equalsIgnoreCase("on"))
         			{
         				Utils.setActive(this.relatedActivity);

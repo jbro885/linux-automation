@@ -4,6 +4,9 @@
         android:id="@+id/settings"
         android:title="@string/action_settings"/>
     <item
-        android:id="@+id/refresh"
-        android:title="@string/refresh"/>
-</menu>
+        android:id="@+id/refreshstatus"
+        android:title="@string/refreshStatus"/>
+    <item
+        android:id="@+id/refreshwebcam"
+        android:title="@string/refreshWebcam"/>
+</menu> 

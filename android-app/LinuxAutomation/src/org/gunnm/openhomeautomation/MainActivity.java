@@ -22,7 +22,13 @@ public class MainActivity extends Activity {
 	
 	private Handler mHandler = new Handler();
 	
+	public void showInfo (String info)
+	{
+		TextView infoTextView = (TextView) this.findViewById(R.id.infoText);
+		infoTextView.setText(info);
 		
+	}
+	
 	private Runnable periodicTask = new Runnable()
 	{
         public void run()
@@ -34,6 +40,10 @@ public class MainActivity extends Activity {
 //	            Log.d("PeriodicTimerService","Awake");
 	        	refreshWebcam();
         	}
+	        if (refresh == 0)
+	        {
+	        	showInfo ("Webcam refresh disabled");
+	        }
 	        
 	        if (refresh == 0)
 	        {
@@ -202,9 +212,14 @@ public class MainActivity extends Activity {
     	  		startActivity(i);
     	  		return true;
     	  	}
-    	  	case R.id.refresh:
+    	  	case R.id.refreshstatus:
     	  	{
     	  		refreshStatus();
+
+    	  		return true;
+    	  	}
+    	  	case R.id.refreshwebcam:
+    	  	{
     	  		refreshWebcam();
 
     	  		return true;
