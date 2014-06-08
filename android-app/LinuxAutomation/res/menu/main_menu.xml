@@ -9,4 +9,7 @@
     <item
         android:id="@+id/refreshwebcam"
         android:title="@string/refreshWebcam"/>
+    <item
+        android:id="@+id/openlogger"
+        android:title="@string/action_open_logger"/>    
 </menu> 

@@ -224,6 +224,13 @@ public class MainActivity extends Activity {
 
     	  		return true;
     	  	}
+    	  	 
+    	  	case R.id.openlogger:
+    	  	{
+    	  		Intent i = new Intent(this, org.gunnm.openhomeautomation.LoggerActivity.class);
+    	  		startActivity(i);
+    	  		return true;
+    	  	}
     	  }
     	  return true;
     	} 
