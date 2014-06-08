@@ -61,6 +61,8 @@ sub stop_global
    {
       system ($conf->{'MOTION_INIT_SCRIPT'} . " stop");
    }
+
+   print "System stopped\n";
    return 1;
 }
 
@@ -129,6 +131,7 @@ sub build_answer
          if (start_global () == 1)
          {      
             $answer->{'value'} = "on";
+            $status->{'status'} = "off";
          }
 
       }
@@ -137,6 +140,7 @@ sub build_answer
          if (stop_global () == 1)
          {
             $answer->{'value'} = "off";
+            $status->{'status'} = "off";
          }
       }
    }
