@@ -26,6 +26,10 @@
 		        android:screenOrientation="nosensor">
 
 		</activity>
+		<activity android:name="org.gunnm.openhomeautomation.LoggerActivity" android:label="@string/action_logger"
+		        android:screenOrientation="nosensor">
+
+		</activity>
     </application>
 
 </manifest>
