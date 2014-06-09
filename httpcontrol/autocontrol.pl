@@ -89,8 +89,13 @@ sub send_str
 
 sub receive_str
 {
-   my $response;
-   $socket->recv($response, 1024);
+   my $response = "";
+   my $res;
+
+   while (my $line = <$socket>)
+   {
+      $response .= $line;
+   }
    return ($response);
 }
 

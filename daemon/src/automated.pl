@@ -261,6 +261,7 @@ while (1)
                else
                {
                   my $output = XMLout ($answer,KeyAttr => { server => 'answer' }) . "\n";
+                  print $output;
                   print $rh $output;
 
                   $rh->flush;
