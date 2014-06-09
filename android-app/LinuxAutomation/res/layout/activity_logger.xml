@@ -6,15 +6,32 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+	<TextView
+        android:id="@+id/tv1"
+        android:text="Summary"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </TextView>
 
+
+    
     <ListView
-        android:id="@+id/summary"
+        android:id="@+id/logger_summary"
         android:layout_width="match_parent"
         android:layout_height="179dp" >
     </ListView>
+    
+    <TextView
+        android:id="@+id/tv2"
+        android:text="List of events"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </TextView>
 
     <ListView
-        android:id="@+id/allevents"
+        android:id="@+id/logger_allevents_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>

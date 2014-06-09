@@ -25,32 +25,32 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class LoggerActivity extends Activity {
-	
-	List<Map<String, String>> planetsList = new ArrayList<Map<String,String>>();
-		 
-		 
-		   private void initList() {
-		    // We populate the planets
-		 
-		    planetsList.add(createPlanet("planet", "Mercury"));
-		    planetsList.add(createPlanet("planet", "Venus"));
-		    planetsList.add(createPlanet("planet", "Mars"));
-		    planetsList.add(createPlanet("planet", "Jupiter"));
-		    planetsList.add(createPlanet("planet", "Saturn"));
-		    planetsList.add(createPlanet("planet", "Uranus"));
-		    planetsList.add(createPlanet("planet", "Neptune"));
-		 
-		}
-		   
-		   private HashMap<String, String> createPlanet(String key, String name) {
-			   	    HashMap<String, String> planet = new HashMap<String, String>();
-			   	    planet.put(key, name);
-			   	 
-			   	    return planet;
-			   	}
-		 
 
+	List<Map<String, String>> allEventsList = new ArrayList<Map<String,String>>();
+	List<Map<String, String>> summary       = new ArrayList<Map<String,String>>();
+
+	public void refreshEventList ()
+	{
+		HashMap <String,String> entry = new HashMap<String,String> ();
+		entry.put("event", "myevent");
+
+		allEventsList.add (entry);
+	}
 	
+	public void refreshSummary()
+	{
+		HashMap <String,String> entry = new HashMap<String,String> ();
+		entry.put("info", "summaryline1");
+
+		summary.add (entry);
+	}
+	
+	
+
+
+
+
+
 	public void onStart()
 	{
 		super.onStart();
@@ -65,18 +65,28 @@ public class LoggerActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-//		Log.d("Logger", "creating the logger");
+		ListView 		listView;
+		SimpleAdapter 	simpleAdpt;
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_logger);
 
-//		Log.d("Logger", "logger created");
-		
-		ListView myListView = (ListView) findViewById(R.id.allevents);
+		//		Log.d("Logger", "logger created");
+
+		listView = (ListView) findViewById(R.id.logger_allevents_list);
+
+		simpleAdpt = new SimpleAdapter(this, this.allEventsList, android.R.layout.simple_list_item_1, new String[] {"event"}, new int[] {android.R.id.text1});
+		listView.setAdapter(simpleAdpt);
 	
-		SimpleAdapter simpleAdpt = new SimpleAdapter(this, planetsList, android.R.layout.simple_list_item_1, new String[] {"planet"}, new int[] {android.R.id.text1});
-		myListView.setAdapter(simpleAdpt);
-		initList();
+		listView = (ListView) findViewById(R.id.logger_summary);
+
+		simpleAdpt = new SimpleAdapter(this, this.summary, android.R.layout.simple_list_item_1, new String[] {"info"}, new int[] {android.R.id.text1});
+		listView.setAdapter(simpleAdpt);
 		
+		
+		refreshEventList ();
+
+		refreshSummary();
+
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
