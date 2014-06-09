@@ -36,14 +36,18 @@ if [ "$ENABLE_EMAIL" = "1" ]; then
   fi
 
    if [ "$SEND" = "1" ]; then
-	DATE=`date +%Y%m%d-%H%M`
-	ALERT="Motion detected at $DATE check picture for more details and information."
-	for addr in $RECIPIENTS; do
-		echo "$ALERT" | mail -s "MOTION ALERT on $SYSTEM_NAME" -a $1 $addr
-	done
-	rm -f ${TMPFILE}
-	touch ${TMPFILE}
-	
+      DATE=`date +%Y%m%d-%H%M`
+	   ALERT="Motion detected at $DATE check picture for more details and information."
+	   for addr in $RECIPIENTS; do
+		   echo "$ALERT" | mail -s "MOTION ALERT on $SYSTEM_NAME" -a $1 $addr
+	   done
+	   rm -f ${TMPFILE}
+	   touch ${TMPFILE}
+   fi
+
+   if [ "$ENABLE_LOGGING" = "1" ]; then
+      LOGDATE=`date "+%Y%m%d%H%M%S"`
+      echo "CAMERA $LOGDATE EVENT DETECTED" >> $LOGFILE
    fi
 fi
 

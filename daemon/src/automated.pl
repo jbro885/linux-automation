@@ -28,7 +28,7 @@ sub read_config
    open MYFILE, "/etc/automated.conf";
    while (my $line = <MYFILE>)
    {
-      my ($key,$value) = $line =~ /([\w\d\_]+)=([\w\d\.\_]+)/;
+      my ($key,$value) = $line =~ /([\w\d\_]+)=([\w\d\.\_\/]+)/;
 
       if (defined ($key) && defined ($value))
       {
@@ -148,13 +148,25 @@ sub build_answer
    elsif ($request->{'cmd'} eq "get-events")
    {
       $answer->{'type'} = "events";
-      my $event;
       my @values;
-      $event->{'event_type'} = 'camera';
-      $event->{'event_time'} = 'April, 12 1983';
-      $event->{'event_detail'} = 'new guy into the house';
-      push @values, $event;
 
+      my $use_log = $conf->{'ENABLE_LOGGING'};
+      my $logfile = $conf->{'LOGFILE'};
+
+      if ( (defined ($use_log)) && ($use_log == 1) && (defined ($logfile)) && ( -r $logfile))
+      {
+         open LOGFILE , "$logfile";
+         while (my $line = <LOGFILE>)
+         {
+            my ($type, $time, $details) = ($line =~/^(.*)\s(\d*)\s(.*)/);
+            my $event;
+            $event->{'type'} = $type;
+            $event->{'time'} = $time;
+            $event->{'detail'} = $details;
+            push @values, $event;
+         }
+         close LOGFILE;
+      }
 
       $answer->{'event'} = \@values;
    }
