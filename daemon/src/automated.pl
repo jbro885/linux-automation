@@ -121,6 +121,43 @@ sub build_answer
       $answer->{'type'} = "global-status";
       $answer->{'value'} = $status->{'status'};
    }
+   elsif ($request->{'cmd'} eq "get-summary")
+   {
+      my @values;
+      $answer->{'type'} = "summary";
+
+      my $camera_status;
+      $camera_status->{'camera_status'}         = 'on';
+      push @values, $camera_status;
+
+      my $camera_last_event;
+      $camera_last_event->{'camera_last_event'}     = 'April, 12 1983';
+      push @values, $camera_last_event;
+
+      my $sensor1_status;
+      $sensor1_status->{'sensor1_status'}         = 'on';
+      push @values, $sensor1_status;
+
+      my $sensor1_last_event;
+      $sensor1_last_event->{'sensor1_last_event'}     = 'April, 12 1983';
+      push @values, $sensor1_last_event;
+
+      $answer->{'value'} = \@values;
+
+   }
+   elsif ($request->{'cmd'} eq "get-events")
+   {
+      $answer->{'type'} = "events";
+      my $event;
+      my @values;
+      $event->{'event_type'} = 'camera';
+      $event->{'event_time'} = 'April, 12 1983';
+      $event->{'event_detail'} = 'new guy into the house';
+      push @values, $event;
+
+
+      $answer->{'event'} = \@values;
+   }
    elsif ($request->{'cmd'} eq "set-global-status")
    {
 

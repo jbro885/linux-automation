@@ -110,26 +110,12 @@ sub check_request
    $request = shift;
    $value = shift;
 
-   if ($request eq "get-global-status")
-   {
-      return 1;
-   }
-   elsif ($request eq "set-global-status")
-   {
-      if ($value eq "on")
-      {
-         return 1;
-      }
-      elsif ($value eq "off")
-      {
-         return 1;
-      }
-   }
-
-   if ($request eq "get-webcam-picture")
-   {
-      return 1;
-   }
+   return 1 if (($request eq "set-global-status") and ($value eq "on"));
+   return 1 if (($request eq "set-global-status") and ($value eq "off"));
+   return 1 if ($request eq "get-global-status");
+   return 1 if ($request eq "get-webcam-picture");
+   return 1 if ($request eq "get-summary");
+   return 1 if ($request eq "get-events");
 
    return 0;
 }
@@ -141,6 +127,29 @@ sub handle_request
    my $tmp;
    $request = shift;
    $value = shift;
+
+   if ($request eq "get-summary")
+   {
+      $tmp = "<request cmd=\"get-summary\"/>\n";
+      send_str ($tmp);
+      $tmp = receive_str ();
+
+      print "Content-Type: text/plain\n\n";
+      print $tmp;
+   }
+
+
+   if ($request eq "get-events")
+   {
+      $tmp = "<request cmd=\"get-events\"/>\n";
+      send_str ($tmp);
+      $tmp = receive_str ();
+
+      print "Content-Type: text/plain\n\n";
+      print $tmp;
+   }
+
+
 
    if ($request eq "get-global-status")
    {
