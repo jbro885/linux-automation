@@ -15,14 +15,20 @@ import java.util.List;
 
 
 
+
+
+
 import org.gunnm.openhomeautomation.R;
 import org.gunnm.openhomeautomation.RequestTask;
 import org.gunnm.openhomeautomation.RequestType;
 import org.gunnm.openhomeautomation.R.id;
 import org.gunnm.openhomeautomation.R.layout;
 import org.gunnm.openhomeautomation.R.menu;
-
+import org.gunnm.openhomeautomation.ServerStatus;
 import org.gunnm.openhomeautomation.logger.Event;
+import org.gunnm.openhomeautomation.logger.EventAdapter;
+import org.gunnm.openhomeautomation.logger.EventType;
+
 
 //import android.util.Log;
 import android.view.Menu;
@@ -51,21 +57,17 @@ public class Logger extends Activity {
 	
 	public void refreshEventList ()
 	{
-		HashMap <String,String> entry = new HashMap<String,String> ();
-		entry.put("event", "bla1");
-		this.allEventsList.add(entry);
-		
+
 		for (Event evt : allEvents)
 		{
-			entry = new HashMap<String,String> ();
-			entry.put("event", "bla" + evt.getDetails());
+			HashMap <String,String> entry = new HashMap<String,String> ();
+			entry.put("event", evt.getDateString() + " " + Event.eventTypeToString(evt.getType()) + evt.getDetails());
 			Log.d("Logger", "adding" + evt.getDetails());
 			this.allEventsList.add(entry);
 		}
 		
-  		ListView listView = (ListView) findViewById(R.id.logger_allevents_list);
-  		SimpleAdapter simpleAdpt = new SimpleAdapter(this, this.allEventsList, android.R.layout.simple_list_item_1, new String[] {"event"}, new int[] {android.R.id.text1});
-		listView.setAdapter(simpleAdpt);
+  		ListView listView = (ListView) findViewById(R.id.logger_allevents_list); 
+        listView.setAdapter(new EventAdapter(this, allEvents));
   		updateInProgress = false;
 		
 	}
@@ -83,6 +85,11 @@ public class Logger extends Activity {
 
 	private synchronized void refreshEvents ()
     {
+		if (! ServerStatus.isRunning())
+		{
+			return;
+		}
+		
     	if (updateInProgress)
     	{
     		return;
@@ -96,8 +103,6 @@ public class Logger extends Activity {
   		rt.setActivity(instance);
   		rt.setRequestType (RequestType.GET_EVENTS);
   		rt.execute();
-
-
     }
 
 
@@ -124,16 +129,10 @@ public class Logger extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_logger);
 
-		//		Log.d("Logger", "logger created");
 
-		listView = (ListView) findViewById(R.id.logger_allevents_list);
-
-		simpleAdpt = new SimpleAdapter(this, this.allEventsList, android.R.layout.simple_list_item_1, new String[] {"event"}, new int[] {android.R.id.text1});
-		listView.setAdapter(simpleAdpt);
-	
 		listView = (ListView) findViewById(R.id.logger_summary);
 
-		simpleAdpt = new SimpleAdapter(this, this.summary, android.R.layout.simple_list_item_1, new String[] {"info"}, new int[] {android.R.id.text1});
+		simpleAdpt = new SimpleAdapter(this, this.summary, android.R.layout.simple_list_item_2, new String[] {"info"}, new int[] {android.R.id.text1});
 		listView.setAdapter(simpleAdpt);
 	
 		
