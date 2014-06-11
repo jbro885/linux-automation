@@ -156,13 +156,15 @@ sub build_answer
       if ( (defined ($use_log)) && ($use_log == 1) && (defined ($logfile)) && ( -r $logfile))
       {
          open LOGFILE , "$logfile";
-         while (my $line = <LOGFILE>)
+         my $nblines = 0;
+         while ( (my $line = <LOGFILE>) and ($nblines < 100))
          {
             my ($type, $time, $details) = ($line =~/^(.*)\s(\d*)\s(.*)/);
             my $event;
             $event->{'type'} = $type;
             $event->{'time'} = $time;
             $event->{'detail'} = $details;
+            $nblines = $nblines + 1;
             push @values, $event;
          }
          close LOGFILE;
@@ -180,7 +182,7 @@ sub build_answer
          if (start_global () == 1)
          {      
             $answer->{'value'} = "on";
-            $status->{'status'} = "off";
+            $status->{'status'} = "on";
          }
 
       }
