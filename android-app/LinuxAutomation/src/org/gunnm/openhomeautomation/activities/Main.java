@@ -1,4 +1,14 @@
-package org.gunnm.openhomeautomation;
+package org.gunnm.openhomeautomation.activities;
+
+import org.gunnm.openhomeautomation.PrefsUtils;
+import org.gunnm.openhomeautomation.R;
+import org.gunnm.openhomeautomation.RequestTask;
+import org.gunnm.openhomeautomation.RequestType;
+import org.gunnm.openhomeautomation.ServerStatus;
+import org.gunnm.openhomeautomation.WebcamTask;
+import org.gunnm.openhomeautomation.R.id;
+import org.gunnm.openhomeautomation.R.layout;
+import org.gunnm.openhomeautomation.R.menu;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,8 +24,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
-	public static MainActivity instance;
+public class Main extends Activity {
+	public static Main instance;
 	public static final int ONE_SECOND = 1000;
 	
 	private boolean updateInProgress = false;
@@ -86,7 +96,7 @@ public class MainActivity extends Activity {
             	RequestTask rt = new RequestTask();
           		ProgressBar pb = (ProgressBar) instance.findViewById(R.id.progressBar);
           		rt.setProgressBar(pb);
-    	  		rt.setActivity(MainActivity.instance);
+    	  		rt.setActivity(Main.instance);
     	  		
     	  		/**
     	  		 * If the server is active, the user pushes the button
@@ -208,7 +218,7 @@ public class MainActivity extends Activity {
     	  {
     	  	case R.id.settings:
     	  	{
-    	  		Intent i = new Intent(this, org.gunnm.openhomeautomation.SettingsActivity.class);
+    	  		Intent i = new Intent(this, org.gunnm.openhomeautomation.activities.Settings.class);
     	  		startActivity(i);
     	  		return true;
     	  	}
@@ -227,7 +237,7 @@ public class MainActivity extends Activity {
     	  	 
     	  	case R.id.openlogger:
     	  	{
-    	  		Intent i = new Intent(this, org.gunnm.openhomeautomation.LoggerActivity.class);
+    	  		Intent i = new Intent(this, org.gunnm.openhomeautomation.activities.Logger.class);
     	  		startActivity(i);
     	  		return true;
     	  	}

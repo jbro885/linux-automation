@@ -3,6 +3,8 @@ package org.gunnm.openhomeautomation;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,22 +17,26 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.gunnm.openhomeautomation.activities.Logger;
+import org.gunnm.openhomeautomation.logger.Event;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.util.Log;
 //import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
 
-class RequestTask extends AsyncTask<String, String, String>{
-	private Activity relatedActivity = null;
-	private RequestType requestType = null;
-	private String errMessage = null;
-	private ProgressBar progressBar = null;
+public class RequestTask extends AsyncTask<String, String, String>{
+	private Activity 		relatedActivity = null;
+	private RequestType 	requestType = null;
+	private String 			errMessage = null;
+	private ProgressBar 	progressBar = null;
 	
 	public void setActivity (Activity a)
 	{
@@ -216,6 +222,57 @@ class RequestTask extends AsyncTask<String, String, String>{
         		}
         		break;
         	}
+        	case GET_EVENTS:
+        	{
+        		List<Event> events = new ArrayList<Event>();
+//        		Log.d ("RequestTask", "node name: " + node.getNodeName());
+        		NodeList children = node.getChildNodes();
+        		for (int i = 0 ; i < children.getLength() ; i++)
+        		{
+        			Node child = children.item(i);
+        			Log.d("RequestTask", "child value" + child.getNodeName());
+        			if (child.getNodeName().equalsIgnoreCase("event"))
+        			{
+        				Node attr = null;
+        				String detailString = null;
+        				String timeString = null;
+        				String typeString = null;
+        				
+        				attr = child.getAttributes().getNamedItem("detail");
+        				if (attr != null)
+        				{
+        					detailString = attr.getNodeValue();
+        				}
+        				
+        				attr = child.getAttributes().getNamedItem("time");
+        				if (attr != null)
+        				{
+        					timeString = attr.getNodeValue();
+        				}
+        				
+        				attr = child.getAttributes().getNamedItem("type");
+        				if (attr != null)
+        				{
+        					typeString = attr.getNodeValue();
+        				}
+        				
+        				Log.d("RequestTask", "detail=" + detailString + ";time=" + timeString + ";type=" + typeString);
+        				
+        				if ((detailString != null) && (timeString != null) && (typeString != null))
+        				{
+        					events.add(new Event (typeString,timeString,detailString));
+        				}
+        			}
+        		}
+        		
+        		if (relatedActivity instanceof Logger)
+        		{
+        			((Logger)relatedActivity).setEvents (events);
+        			((Logger)relatedActivity).refreshEventList();
+        		}
+        		break;
+        	}
+        	
         	case SET_GLOBAL_STATE_ON:
         	{
 //        		Log.d ("RequestTask", "node name: " + node.getNodeName());

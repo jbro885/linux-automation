@@ -58,6 +58,16 @@ public class Utils
 		{
 			ret = "request=set-global-status&value=off";
 		}
+		
+		if (requestType == RequestType.GET_SUMMARY)
+		{
+			ret = "request=set-global-summary";
+		}
+		
+		if (requestType == RequestType.GET_EVENTS)
+		{
+			ret = "request=get-events";
+		}
 		return ret;
 	}
 	

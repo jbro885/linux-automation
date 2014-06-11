@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
-class WebcamTask extends AsyncTask<String, String, Bitmap>{
+public class WebcamTask extends AsyncTask<String, String, Bitmap>{
 	private Activity relatedActivity = null;
 
 	private ProgressBar progressBar = null;
