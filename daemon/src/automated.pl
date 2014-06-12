@@ -127,22 +127,13 @@ sub build_answer
       $answer->{'type'} = "summary";
 
       my $camera_status;
-      $camera_status->{'camera_status'}         = 'on';
+      $camera_status->{'type'}           = 'camera';
+      $camera_status->{'status'}         = 'on';
+      $camera_status->{'name'}           = 'mycamera0';
+      $camera_status->{'last_event'}     = '20141010235923';
       push @values, $camera_status;
 
-      my $camera_last_event;
-      $camera_last_event->{'camera_last_event'}     = 'April, 12 1983';
-      push @values, $camera_last_event;
-
-      my $sensor1_status;
-      $sensor1_status->{'sensor1_status'}         = 'on';
-      push @values, $sensor1_status;
-
-      my $sensor1_last_event;
-      $sensor1_last_event->{'sensor1_last_event'}     = 'April, 12 1983';
-      push @values, $sensor1_last_event;
-
-      $answer->{'value'} = \@values;
+      $answer->{'device'} = \@values;
 
    }
    elsif ($request->{'cmd'} eq "get-events")
