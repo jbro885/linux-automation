@@ -18,6 +18,12 @@ import java.util.List;
 
 
 
+
+
+
+import org.gunnm.openautomation.model.Event;
+import org.gunnm.openautomation.model.EventType;
+import org.gunnm.openautomation.model.Summary;
 import org.gunnm.openhomeautomation.R;
 import org.gunnm.openhomeautomation.RequestTask;
 import org.gunnm.openhomeautomation.RequestType;
@@ -25,10 +31,12 @@ import org.gunnm.openhomeautomation.R.id;
 import org.gunnm.openhomeautomation.R.layout;
 import org.gunnm.openhomeautomation.R.menu;
 import org.gunnm.openhomeautomation.ServerStatus;
-import org.gunnm.openhomeautomation.logger.Event;
 import org.gunnm.openhomeautomation.logger.EventAdapter;
-import org.gunnm.openhomeautomation.logger.EventType;
 
+
+
+
+import org.gunnm.openhomeautomation.logger.SummaryAdapter;
 
 //import android.util.Log;
 import android.view.Menu;
@@ -45,9 +53,9 @@ import android.widget.TextView;
 public class Logger extends Activity {
 
 	List<Event> allEvents = new ArrayList<Event>();
-	List<Map<String, String>> allEventsList = new ArrayList<Map<String,String>>();
-	List<Map<String, String>> summary       = new ArrayList<Map<String,String>>();
-	private static boolean updateInProgress = false;
+	Summary summary = new Summary();
+	private static boolean updateEventsInProgress = false;
+	private static boolean updateSummaryInProgress = false;
 	private static Logger instance;
 	
 	public void setEvents (List<Event> list)
@@ -55,29 +63,70 @@ public class Logger extends Activity {
 		this.allEvents = list;
 	}
 	
-	public void refreshEventList ()
+	public void setSummary (Summary p_summary)
 	{
+		this.summary = p_summary;
+	}
+	
+	public void refreshEventList ()
+	{	
+		List<Map<String, String>> allEventsList = new ArrayList<Map<String,String>>();
+
 
 		for (Event evt : allEvents)
 		{
 			HashMap <String,String> entry = new HashMap<String,String> ();
 			entry.put("event", evt.getDateString() + " " + Event.eventTypeToString(evt.getType()) + evt.getDetails());
 			Log.d("Logger", "adding" + evt.getDetails());
-			this.allEventsList.add(entry);
+			allEventsList.add(entry);
 		}
 		
   		ListView listView = (ListView) findViewById(R.id.logger_allevents_list); 
         listView.setAdapter(new EventAdapter(this, allEvents));
-  		updateInProgress = false;
-		
+  	
 	}
+
+	public void refreshSummaryList ()
+	{	
+		List<Map<String, String>> allEventsList = new ArrayList<Map<String,String>>();
+
+
+		for (Event evt : allEvents)
+		{
+			HashMap <String,String> entry = new HashMap<String,String> ();
+			entry.put("event", evt.getDateString() + " " + Event.eventTypeToString(evt.getType()) + evt.getDetails());
+			Log.d("Logger", "adding" + evt.getDetails());
+			allEventsList.add(entry);
+		}
+		
+  		ListView listView = (ListView) findViewById(R.id.logger_summary); 
+        listView.setAdapter(new SummaryAdapter(this, summary));
+  	
+	}
+
+	
 	
 	public void refreshSummary()
 	{
-		HashMap <String,String> entry = new HashMap<String,String> ();
-		entry.put("info", "summaryline1");
-
-		summary.add (entry);
+		if (! ServerStatus.isRunning())
+		{
+			return;
+		}
+		
+    	if (updateSummaryInProgress)
+    	{
+    		return;
+    	}
+    	
+    	updateSummaryInProgress = true;
+    	
+  		RequestTask rt = new RequestTask();
+  		ProgressBar pb = (ProgressBar) this.findViewById(R.id.progressBarLogger);
+  		rt.setProgressBar(pb);
+  		rt.setActivity(instance);
+  		rt.setRequestType (RequestType.GET_SUMMARY);
+  		rt.execute();
+  		updateSummaryInProgress = false;
 	}
 	
 	
@@ -90,11 +139,11 @@ public class Logger extends Activity {
 			return;
 		}
 		
-    	if (updateInProgress)
+    	if (updateEventsInProgress)
     	{
     		return;
     	}
-    	updateInProgress = true;
+    	updateEventsInProgress = true;
     
     	
   		RequestTask rt = new RequestTask();
@@ -103,6 +152,8 @@ public class Logger extends Activity {
   		rt.setActivity(instance);
   		rt.setRequestType (RequestType.GET_EVENTS);
   		rt.execute();
+  		
+  		updateEventsInProgress = false;
     }
 
 
@@ -129,12 +180,6 @@ public class Logger extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_logger);
 
-
-		listView = (ListView) findViewById(R.id.logger_summary);
-
-		simpleAdpt = new SimpleAdapter(this, this.summary, android.R.layout.simple_list_item_2, new String[] {"info"}, new int[] {android.R.id.text1});
-		listView.setAdapter(simpleAdpt);
-	
 		
 		refreshEvents();
 		

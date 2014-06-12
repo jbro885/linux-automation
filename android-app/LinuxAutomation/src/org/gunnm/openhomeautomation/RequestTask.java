@@ -17,8 +17,10 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.gunnm.openautomation.model.Device;
+import org.gunnm.openautomation.model.Event;
+import org.gunnm.openautomation.model.Summary;
 import org.gunnm.openhomeautomation.activities.Logger;
-import org.gunnm.openhomeautomation.logger.Event;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -222,6 +224,67 @@ public class RequestTask extends AsyncTask<String, String, String>{
         		}
         		break;
         	}
+        	
+        	case GET_SUMMARY:
+        	{
+        		
+        		Summary summary = new Summary();
+//        		Log.d ("RequestTask", "node name: " + node.getNodeName());
+        		NodeList children = node.getChildNodes();
+        		for (int i = 0 ; i < children.getLength() ; i++)
+        		{
+        			
+        			Node child = children.item(i);
+        			Log.d("RequestTask", "child value" + child.getNodeName());
+        			if (child.getNodeName().equalsIgnoreCase("device"))
+        			{
+        				Node attr = null;
+        				String typeString = null;
+        				String lastEventString = null;
+        				String statusString = null;
+        				String nameString = null;
+        				
+        				attr = child.getAttributes().getNamedItem("type");
+        				if (attr != null)
+        				{
+        					typeString = attr.getNodeValue();
+        				}
+        				
+        				attr = child.getAttributes().getNamedItem("status");
+        				if (attr != null)
+        				{
+        					statusString = attr.getNodeValue();
+        				}
+        				
+        				attr = child.getAttributes().getNamedItem("last_event");
+        				if (attr != null)
+        				{
+        					lastEventString = attr.getNodeValue();
+        				}
+        				
+        				attr = child.getAttributes().getNamedItem("name");
+        				if (attr != null)
+        				{
+        					nameString = attr.getNodeValue();
+        				}
+        				
+        				if ((statusString != null) && (lastEventString != null) && (typeString != null) && (nameString != null))
+        				{
+        					Device dev = new Device (nameString);
+        					
+        					summary.addDevice(dev);
+        				}
+        			}
+        		}
+        		
+        		if (relatedActivity instanceof Logger)
+        		{
+        			((Logger)relatedActivity).setSummary (summary);
+        			((Logger)relatedActivity).refreshSummary();
+        		}
+        		 break;
+        	}
+        	
         	case GET_EVENTS:
         	{
         		List<Event> events = new ArrayList<Event>();

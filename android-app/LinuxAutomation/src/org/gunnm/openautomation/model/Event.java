@@ -1,4 +1,4 @@
-package org.gunnm.openhomeautomation.logger;
+package org.gunnm.openautomation.model;
 
 import java.util.Date;
 

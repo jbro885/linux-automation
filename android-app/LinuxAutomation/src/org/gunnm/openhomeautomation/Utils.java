@@ -61,7 +61,7 @@ public class Utils
 		
 		if (requestType == RequestType.GET_SUMMARY)
 		{
-			ret = "request=set-global-summary";
+			ret = "request=get-summary";
 		}
 		
 		if (requestType == RequestType.GET_EVENTS)
