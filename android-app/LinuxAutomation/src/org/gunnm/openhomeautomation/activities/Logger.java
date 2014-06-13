@@ -70,17 +70,6 @@ public class Logger extends Activity {
 	
 	public void refreshEventList ()
 	{	
-		List<Map<String, String>> allEventsList = new ArrayList<Map<String,String>>();
-
-
-		for (Event evt : allEvents)
-		{
-			HashMap <String,String> entry = new HashMap<String,String> ();
-			entry.put("event", evt.getDateString() + " " + Event.eventTypeToString(evt.getType()) + evt.getDetails());
-			Log.d("Logger", "adding" + evt.getDetails());
-			allEventsList.add(entry);
-		}
-		
   		ListView listView = (ListView) findViewById(R.id.logger_allevents_list); 
         listView.setAdapter(new EventAdapter(this, allEvents));
   	
@@ -88,16 +77,6 @@ public class Logger extends Activity {
 
 	public void refreshSummaryList ()
 	{	
-		List<Map<String, String>> allEventsList = new ArrayList<Map<String,String>>();
-
-
-		for (Event evt : allEvents)
-		{
-			HashMap <String,String> entry = new HashMap<String,String> ();
-			entry.put("event", evt.getDateString() + " " + Event.eventTypeToString(evt.getType()) + evt.getDetails());
-			Log.d("Logger", "adding" + evt.getDetails());
-			allEventsList.add(entry);
-		}
 		
   		ListView listView = (ListView) findViewById(R.id.logger_summary); 
         listView.setAdapter(new SummaryAdapter(this, summary));
@@ -172,19 +151,12 @@ public class Logger extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-
-		
-		instance = this;
-		ListView 		listView;
-		SimpleAdapter 	simpleAdpt;
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_logger);
 
+		instance = this;
 		
 		refreshEvents();
-		
-		
-
 		refreshSummary();
 
 	}

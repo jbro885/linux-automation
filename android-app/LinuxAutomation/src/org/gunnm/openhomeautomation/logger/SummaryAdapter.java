@@ -2,6 +2,8 @@ package org.gunnm.openhomeautomation.logger;
 
 import java.util.List;
 
+import org.gunnm.openautomation.model.Device;
+import org.gunnm.openautomation.model.DeviceStatus;
 import org.gunnm.openautomation.model.Event;
 import org.gunnm.openautomation.model.Summary;
 import org.gunnm.openhomeautomation.R;
@@ -48,11 +50,26 @@ public class SummaryAdapter extends BaseAdapter
     public View getView(int position, View convertView, ViewGroup parent) 
     {
         View vi = convertView;
+        String textInfo;
+        Device dev = summary.getDevices().get(position);
+        
         if (vi == null)
-            vi = inflater.inflate(R.layout.logger_event_row, null);
+            vi = inflater.inflate(R.layout.logger_summary_row, null);
         TextView text_primary = (TextView) vi.findViewById(R.id.logger_event_label_primary);
         TextView text_secondary = (TextView) vi.findViewById(R.id.logger_event_label_secondary);
-        text_primary.setText(summary.getDevices().get(position).getName());
+        
+        if (dev.getStatus() == DeviceStatus.ONLINE)
+        {
+        	textInfo = "online";
+        }
+        else
+        {
+        	textInfo = "offline";
+        }
+        
+        
+        text_primary.setText(dev.getName());
+        text_secondary.setText(textInfo);
         return vi;
     }
 }

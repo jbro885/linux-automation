@@ -18,6 +18,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.gunnm.openautomation.model.Device;
+import org.gunnm.openautomation.model.DeviceStatus;
 import org.gunnm.openautomation.model.Event;
 import org.gunnm.openautomation.model.Summary;
 import org.gunnm.openhomeautomation.activities.Logger;
@@ -271,7 +272,15 @@ public class RequestTask extends AsyncTask<String, String, String>{
         				if ((statusString != null) && (lastEventString != null) && (typeString != null) && (nameString != null))
         				{
         					Device dev = new Device (nameString);
+        					dev.setStatus(DeviceStatus.OFFLINE);
         					
+        					if (statusString.equalsIgnoreCase("on"))
+        					{
+        						dev.setStatus(DeviceStatus.ONLINE);
+        					}
+        					
+        					
+        					Log.d("RequestTask", "Add new device" + nameString);
         					summary.addDevice(dev);
         				}
         			}
@@ -280,7 +289,7 @@ public class RequestTask extends AsyncTask<String, String, String>{
         		if (relatedActivity instanceof Logger)
         		{
         			((Logger)relatedActivity).setSummary (summary);
-        			((Logger)relatedActivity).refreshSummary();
+        			((Logger)relatedActivity).refreshSummaryList();
         		}
         		 break;
         	}
