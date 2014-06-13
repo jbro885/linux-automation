@@ -177,6 +177,13 @@ public class Logger extends Activity {
   	  		startActivity(i);
   	  		return true;
   	  	}
+  	  	
+  	  	case R.id.refreshlogger:
+  	  	{
+  	  		refreshSummary();
+
+  	  		refreshEvents();
+  	  	}
 
   	  }
   	  return true;

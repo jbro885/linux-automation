@@ -3,4 +3,7 @@
     <item
         android:id="@+id/openmain"
         android:title="@string/action_open_main"/>
+    <item
+        android:id="@+id/refreshlogger"
+        android:title="@string/action_refresh_logger"/>
 </menu> 

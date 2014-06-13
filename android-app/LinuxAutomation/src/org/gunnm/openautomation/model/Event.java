@@ -1,5 +1,6 @@
 package org.gunnm.openautomation.model;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import android.text.method.DateTimeKeyListener;
@@ -97,7 +98,9 @@ public class Event {
 		min 	= eventDate.substring(10, 12);
 		sec 	= eventDate.substring(12, 14);
 		
-//		Log.d ("Event" , "year=" + year);
+		Log.d ("Event" , "year=" + year);
+		Log.d ("Event" , "month=" + month);
+		Log.d ("Event" , "day=" + day);
 		retDate = new Date (Integer.parseInt(year),
 							Integer.parseInt(month),
 							Integer.parseInt(day),
@@ -109,6 +112,8 @@ public class Event {
 	
 	public String getDateString ()
 	{
-		return this.date.getYear() + "-" + this.date.getMonth() + "-" + this.date.getDay() + " " + this.date.getHours() +":" + this.date.getMinutes() +":" + this.date.getSeconds();
+	    Calendar cal = Calendar.getInstance();
+	    cal.setTime(this.date);
+		return date.getYear() + "-" + date.getMonth() + "-" + cal.get(Calendar.DAY_OF_MONTH)  + " " + this.date.getHours() +":" + this.date.getMinutes() +":" + this.date.getSeconds();
 	}
 }
