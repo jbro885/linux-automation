@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class SummaryAdapter extends BaseAdapter 
@@ -57,17 +58,19 @@ public class SummaryAdapter extends BaseAdapter
             vi = inflater.inflate(R.layout.logger_summary_row, null);
         TextView text_primary = (TextView) vi.findViewById(R.id.logger_event_label_primary);
         TextView text_secondary = (TextView) vi.findViewById(R.id.logger_event_label_secondary);
+        ImageView img = (ImageView) vi.findViewById(R.id.device_status);
+        
         
         if (dev.getStatus() == DeviceStatus.ONLINE)
         {
-        	textInfo = "online";
+        	img.setImageResource(R.drawable.offline);
         }
         else
         {
-        	textInfo = "offline";
+        	img.setImageResource(R.drawable.online);
         }
         
-        
+        textInfo = "great device";
         text_primary.setText(dev.getName());
         text_secondary.setText(textInfo);
         return vi;
