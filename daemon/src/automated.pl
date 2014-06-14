@@ -18,6 +18,7 @@ $conf->{'MOTION_STREAM_PORT'} = 8081;
 $conf->{'SERVER_ADDR'}        = "127.0.0.1";
 $conf->{'SERVER_PORT'}        = 1234;
 $conf->{'MOTION_INIT_SCRIPT'} = "/etc/init.d/motion";
+$conf->{'MAX_REPORTED_EVENTS'} = 10;
 
 
 sub read_config
@@ -140,6 +141,7 @@ sub build_answer
    {
       $answer->{'type'} = "events";
       my @values;
+      my @allevents;
 
       my $use_log = $conf->{'ENABLE_LOGGING'};
       my $logfile = $conf->{'LOGFILE'};
@@ -148,7 +150,8 @@ sub build_answer
       {
          open LOGFILE , "$logfile";
          my $nblines = 0;
-         while ( (my $line = <LOGFILE>) and ($nblines < 100))
+         my @allevents;
+         while (my $line = <LOGFILE>)
          {
             my ($type, $time, $details) = ($line =~/^(.*)\s(\d*)\s(.*)/);
             my $event;
@@ -156,8 +159,19 @@ sub build_answer
             $event->{'time'} = $time;
             $event->{'detail'} = $details;
             $nblines = $nblines + 1;
-            push @values, $event;
+            push @allevents, $event;
          }
+
+         my $tmp = 0;
+         my $nbevents = $#allevents;
+
+         while ( $tmp < $conf->{'MAX_REPORTED_EVENTS'})
+         {
+            my $event = $allevents[$nbevents-$tmp];
+            push @values, $event;
+            $tmp++;
+         }
+
          close LOGFILE;
       }
 
